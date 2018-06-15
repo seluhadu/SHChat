@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ffffff</color>
+    <color name="colorPrimaryDark">#cfcfcf</color>
+    <color name="colorAccent">#FF4081</color>
+    //button pressed color
+    <color name="button_dark">#282829</color>
+    //dark theme colors
+    <color name="colorPrimaryDarkTheme">#2b2b2b</color>
+    <color name="colorPrimaryDarkDarkTheme">#121313</color>
+    <color name="colorAccentDarkTheme">#9b9b9b</color>
+    <color name="bodyBackgroundDarkTheme">#ff434343</color>
+    <color name="grayTextDarkTheme">#e3e2df</color>
+    <color name="red">#ea0005</color>
+    //blurry kind theme
+    <color name="colorPrimaryBlur1">#4a3043</color>
+    <color name="colorPrimaryBlur2">#0f1931</color>
+    <color name="colorPrimaryDarkBlur">#32262f</color>
+    <color name="colorAccentBlur">#FF4081</color>
+    <color name="bodyBackgroundBlur1">#4a3043</color>
+    <color name="bodyBackgroundBlur2">#101530</color>
+
+</resources>

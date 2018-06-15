@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "759047037059",
+    "firebase_url": "https://shchat-7b0ef.firebaseio.com",
+    "project_id": "shchat-7b0ef",
+    "storage_bucket": "shchat-7b0ef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:759047037059:android:73ff4cf4f81dbd07",
+        "android_client_info": {
+          "package_name": "com.seluhadu.shchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "759047037059-k7j7eb85boc1v6hlsor2733dmqr3b4a4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.seluhadu.shchat",
+            "certificate_hash": "fc635caf7df77cbb62a3adada47723a16d5904cc"
+          }
+        },
+        {
+          "client_id": "759047037059-vbnqplkpn0v4gi6esvf3o48h3364aa54.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "759047037059-vbnqplkpn0v4gi6esvf3o48h3364aa54.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDb69XiqO2Xe4EiX78ChKQwsypY97_GSyY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "759047037059-vbnqplkpn0v4gi6esvf3o48h3364aa54.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
