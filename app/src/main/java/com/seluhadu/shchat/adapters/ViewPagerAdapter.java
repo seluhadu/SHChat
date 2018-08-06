@@ -1,4 +1,4 @@
-package com.seluhadu.shchat.andapters;
+package com.seluhadu.shchat.adapters;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
-    private List<String> listTittle = new ArrayList<>();
+    private List<String> listTittles = new ArrayList<>();
     private List<Fragment> listFragments = new ArrayList<>();
 
     public void addFragment(Fragment fragment, String title) {
         listFragments.add(fragment);
-        listTittle.add(title);
+        listTittles.add(title);
     }
 
     public ViewPagerAdapter(FragmentManager fm) {
@@ -34,6 +34,6 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
-        return listTittle.get(position);
+        return listTittles.get(position);
     }
 }

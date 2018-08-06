@@ -1,0 +1,1 @@
+package com.seluhadu.shchat.adapters;public class ListChatAdaoter {}

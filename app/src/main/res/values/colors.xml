@@ -19,5 +19,7 @@
     <color name="colorAccentBlur">#FF4081</color>
     <color name="bodyBackgroundBlur1">#4a3043</color>
     <color name="bodyBackgroundBlur2">#101530</color>
-
-</resources>
+    <color name="gray">#f8f8fb</color>
+    <color name="border">#07ca87</color>
+    <color name="received_background">#ebf2f7</color>
+></resources>

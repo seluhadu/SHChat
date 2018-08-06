@@ -1,15 +1,17 @@
 <resources>
-    <string name="app_name">Selu Chat</string>
+    <string name="app_name">SHChat</string>
     <string name="username">User Name</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm</string>
-    <string name="sign_in">SignIn</string>
+    <string name="sign_in">Sign In</string>
     <string name="s_i_g_n_i_n">S i g n i n</string>
     <string name="sign_up">Sign Up</string>
     <string name="s_i_g_n_u_p">S I G N U P</string>
     <string name="email">Email</string>
     <string name="sign_out">Sign Out</string>
     <string name="first_name_and_last_name">First Name and Last Name</string>
+    <string name="unknown">Unknown</string>
+    <string name="search">Search...</string>
 
 
     <string-array name="themes_tittle">
@@ -24,4 +26,19 @@
         <item>black</item>
         <item>blur</item>
     </string-array>
+
+    //FireBase FireStore Collections path
+    <string name="users">Users</string>
+    <string name="messages">Messages</string>
+    <string name="friends">Friends</string>
+    <string name="likes">Likes</string>
+    <string name="posts">Posts</string>
+    <string name="comments">Comments</string>
+//fireBase Storege
+    <string name="photos">Photos</string>
+    <string name="userId">userId</string>
+    <string name="userDisplayName">userDisplayName</string>
+    <string name="already_have_an_account">Already Have An Account?</string>
+    <string name="post">Post</string>
+    <string name="userPosts">UserPosts</string>
 </resources>

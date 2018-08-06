@@ -1,23 +1,18 @@
 package com.seluhadu.shchat;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -26,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -34,19 +28,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.ProviderQueryResult;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.seluhadu.shchat.models.User;
+import com.seluhadu.shchat.utils.FireBaseMethods;
 
-import junit.runner.Version;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -105,46 +96,75 @@ public class SignUpActivity extends AppCompatActivity {
         mConfirm = findViewById(R.id.confirm);
         mProgressDialog = new ProgressDialog(this);
         mUserName = findViewById(R.id.name);
-        mEmail.addTextChangedListener(textWatcher);
-        mPassword.addTextChangedListener(textWatcher);
-        mConfirm.addTextChangedListener(textWatcher);
-        mUserName.addTextChangedListener(textWatcher);
+//        mEmail.addTextChangedListener(textWatcher);
+//        mPassword.addTextChangedListener(textWatcher);
+//        mConfirm.addTextChangedListener(textWatcher);
+//        mUserName.addTextChangedListener(textWatcher);
         mSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sinInUser(mEmail, mPassword, mConfirm, mUserName);
+                signUpUser(mEmail, mPassword, mConfirm, mUserName);
             }
         });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[0]) != PackageManager.PERMISSION_GRANTED ||
-                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[1]) != PackageManager.PERMISSION_GRANTED ||
-                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[2]) != PackageManager.PERMISSION_GRANTED ||
-                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[3]) != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[0]) ||
-                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[1]) ||
-                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[2]) ||
-                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[3])) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setCancelable(true);
-                    builder.setMessage("Read External Storage is necessary to upload picture! \n " +
-                            "Internet is necessary to load and upload content! \n " +
-                            "Write External Storage is necessary to download to your phone!");
-                    builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(SignUpActivity.this, permissionsRequired, PERMISSION_REQUEST);
-                        }
-                    });
+        if (checkPermissionArray(permissionsRequired)) {
 
-                } else {
-                    ActivityCompat.requestPermissions(SignUpActivity.this, permissionsRequired, PERMISSION_REQUEST);
-                }
-            } else {
-                // Do some stuff
+        } else {
+            askPermission(permissionsRequired);
+        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[0]) != PackageManager.PERMISSION_GRANTED ||
+//                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[1]) != PackageManager.PERMISSION_GRANTED ||
+//                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[2]) != PackageManager.PERMISSION_GRANTED ||
+//                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[3]) != PackageManager.PERMISSION_GRANTED) {
+//                if (ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[0]) ||
+//                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[1]) ||
+//                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[2]) ||
+//                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[3])) {
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//                    builder.setCancelable(true);
+//                    builder.setMessage("Read External Storage is necessary to upload picture! \n " +
+//                            "Internet is necessary to load and upload content! \n " +
+//                            "Write External Storage is necessary to download to your phone!");
+//                    builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            ActivityCompat.requestPermissions(SignUpActivity.this, permissionsRequired, PERMISSION_REQUEST);
+//                        }
+//                    });
+//
+//                } else {
+//                    ActivityCompat.requestPermissions(SignUpActivity.this, permissionsRequired, PERMISSION_REQUEST);
+//                }
+//            } else {
+//                // Do some stuff
+//
+//            }
+//        }
 
+    }
+
+    private void askPermission(String[] permissionsRequired) {
+        ActivityCompat.requestPermissions(SignUpActivity.this, permissionsRequired, PERMISSION_REQUEST);
+    }
+
+    private boolean checkPermissionArray(String[] permissionsRequired) {
+        for (int i = 0; i < permissionsRequired.length; i++) {
+            String check = permissionsRequired[i];
+            if (!checkPermission(check)) {
+                return false;
             }
         }
 
+        return true;
+    }
+
+    private boolean checkPermission(String check) {
+        int permissionRequest = ActivityCompat.checkSelfPermission(SignUpActivity.this, check);
+        if (permissionRequest != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override
@@ -155,10 +175,10 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-    private void sinInUser(EditText mEmail, EditText mPassword, EditText mConfirm, final EditText mUserName) {
+    private void signUpUser(EditText mEmail, EditText mPassword, EditText mConfirm, final EditText mUserName) {
         final String email = mEmail.getText().toString();
         final String password = mPassword.getText().toString();
-        String confirm = mConfirm.getText().toString();
+        final String confirm = mConfirm.getText().toString();
         final String name = mUserName.getText().toString();
 
         if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) && !TextUtils.isEmpty(name) /*&& mProfileUri != null*/) {
@@ -173,34 +193,21 @@ public class SignUpActivity extends AppCompatActivity {
                                 userId = mFireBaseAuth.getCurrentUser().getUid();
                                 String userEmail = mFireBaseAuth.getCurrentUser().getEmail();
 
-                                final Map<String, String> userMap = new HashMap<>();
-                                userMap.put("userName", name);
-                                userMap.put("userEmail", email);
-                                userMap.put("userId", userId);
-                                userMap.put("userDecs", "");
-                                userMap.put("userProfile", "");
-
                                 User user = new User();
-                                user.setUserName(name);
+                                user.setUserName(FireBaseMethods.replaceWithDot(name));
+                                user.setUserDisplayName(name);
                                 user.setUserId(userId);
-                                user.setUserDesc("");
                                 user.setUserEmail(userEmail);
                                 user.setUserProfile("");
-                                mFireBaseFireStore.collection("UsersModel").document(userId).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                User users = new User(FireBaseMethods.replaceWithDot(name), userId, "", userEmail, name);
+                                mFireBaseFireStore.collection(getResources().getString(R.string.users)).document(userId).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            mFireBaseFireStore.collection("UsersMap").document(userId).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        uploadProfile();
-                                                        mFireBaseAuth.signOut();
-                                                        hideProgress();
-                                                        sendToSignIn();
-                                                    }
-                                                }
-                                            });
+                                            uploadProfile();
+                                            mFireBaseAuth.signOut();
+                                            hideProgress();
+                                            sendToSignIn();
                                         }
                                     }
                                 });
@@ -218,9 +225,6 @@ public class SignUpActivity extends AppCompatActivity {
                 Toast.makeText(this, "Email is not valid!", Toast.LENGTH_SHORT).show();
             }
         } else {
-            if (mProfileUri == null) {
-                Toast.makeText(this, "Please select profile image!", Toast.LENGTH_SHORT).show();
-            }
             Toast.makeText(this, "Please fill all!", Toast.LENGTH_SHORT).show();
 
         }
@@ -253,26 +257,27 @@ public class SignUpActivity extends AppCompatActivity {
         Log.d(TAG, "showErrorMessage: " + errorMessage);
     }
 
-    private TextWatcher textWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (s.toString().trim().length() > 0) {
-                mSignUp.setEnabled(true);
-            } else {
-                mSignUp.setEnabled(false);
-            }
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-
-        }
-    };
+//    private TextWatcher textWatcher = new TextWatcher() {
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            boolean fieldsOK = validate(new EditText[]{mEmail, mUserName, mPassword, mConfirm});
+//            if (s.toString().trim().length() > 0&& fieldsOK) {
+//                mSignUp.setEnabled(true);
+//            } else {
+//                mSignUp.setEnabled(false);
+//            }
+//        }
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//
+//        }
+//    };
 
     private void sendToMain() {
         Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
@@ -319,7 +324,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void uploadProfile() {
         if (mProfileUri != null) {
-            final StorageReference profileReference = mStorageReference.child("ProfileImages").child(userId + "." + getExtension(mProfileUri));
+            final StorageReference profileReference = mStorageReference.child("Photos/ProfilePhotos/").child(userId + 1 + "." + getExtension(mProfileUri));
             profileReference.putFile(mProfileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -327,8 +332,9 @@ public class SignUpActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Uri uri) {
                             String imageUri = uri.toString();
-                            mFireBaseFireStore.collection("UsersMap").document(userId).update("userProfile", imageUri);
-                            mFireBaseFireStore.collection("UsersModel").document(userId).update("userProfile", imageUri);
+//                            mFireBaseFireStore.collection("UsersMap").document(userId).update("userProfile", imageUri);
+                            mFireBaseFireStore.collection(getResources().getString(R.string.users)).document(userId).update("userProfile", imageUri);
+                            Toast.makeText(SignUpActivity.this, "Type:" + getExtension(mProfileUri), Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -370,27 +376,34 @@ public class SignUpActivity extends AppCompatActivity {
                     for (int i = 0; i < grantResults.length; i++) {
 
                     }
-                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    } else {
-
-                    }
-                    if (grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-
-                    } else {
-
-                    }
-                    if (grantResults[2] == PackageManager.PERMISSION_GRANTED) {
-
-                    } else {
-
-                    }
-                    if (grantResults[3] == PackageManager.PERMISSION_GRANTED) {
-
-                    } else {
-
-                    }
                 }
         }
     }
+
+
+    private boolean chechEmailIsExist(String userId) {
+        mFireBaseAuth.fetchProvidersForEmail(userId).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+            @Override
+            public void onComplete(@NonNull Task<ProviderQueryResult> task) {
+                boolean check = !task.getResult().getProviders().isEmpty();
+                if (!check) {
+                    return;
+                } else {
+
+                }
+            }
+        });
+        return false;
+    }
+
+//    private boolean validate(EditText[] fields) {
+//        for (int i = 0; i < fields.length; i++) {
+//            EditText currentField = fields[i];
+//            if (currentField.getText().toString().length() <= 0) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
+
 }
