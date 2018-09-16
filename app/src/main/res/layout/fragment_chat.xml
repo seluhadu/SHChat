@@ -51,6 +51,7 @@
                 android:src="@drawable/ic_add_circle" />
 
             <EditText
+                android:id="@+id/etm"
                 android:layout_width="0dp"
                 android:background="@drawable/search_back"
                 android:layout_height="38dp"
@@ -60,11 +61,11 @@
                 android:inputType="textCapSentences" />
 
             <ImageButton
+                android:id="@+id/send_message"
                 android:layout_width="?attr/actionBarSize"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_add_circle" />
         </LinearLayout>
     </LinearLayout>
-
 </FrameLayout>

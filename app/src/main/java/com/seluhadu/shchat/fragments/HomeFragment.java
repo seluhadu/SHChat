@@ -26,6 +26,7 @@ import com.seluhadu.shchat.models.Photo;
 import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
+    private static final String TAG = "HomeFragment";
     private FirebaseAuth mFireBaseAuth;
     private FirebaseFirestore mFireBaseFireStore;
     private StorageReference mStorageReference;
@@ -34,6 +35,11 @@ public class HomeFragment extends Fragment {
     private HomeAdapter recyclerAdapter;
 
     public HomeFragment() {
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Nullable
@@ -49,12 +55,11 @@ public class HomeFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerAdapter = new HomeAdapter(getContext(), mPhotos);
         mRecyclerView.setAdapter(recyclerAdapter);
-        mFireBaseFireStore.collection(getResources().getString(R.string.users)).addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
+        mFireBaseFireStore.collection(getResources().getString(R.string.posts)).orderBy("datePosted", Query.Direction.ASCENDING).addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
+                                @javax.annotation.Nullable FirebaseFirestoreException e) {
                 for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
-                    FirebaseFirestore FBFSPosts = FirebaseFirestore.getInstance();
-                    Query query = FBFSPosts.collection("Posts").orderBy("datePosted");
                     if (documentChange.getType() == DocumentChange.Type.ADDED) {
                         Photo photo = documentChange.getDocument().toObject(Photo.class);
                         mPhotos.add(photo);

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Photo implements Parcelable {
     private String caption;
-    private String dateCreated;
+    private String datePosted;
     private String imagePath;
     private String imageId;
     private String userId;
@@ -20,9 +20,9 @@ public class Photo implements Parcelable {
     public Photo() {
     }
 
-    public Photo(String caption, String dateCreated, String imagePath, String imageId, String userId, String tags, String userDisplayName, String userName, List<Like> like, List<Comment> comments) {
+    public Photo(String caption, String datePosted, String imagePath, String imageId, String userId, String tags, String userDisplayName, String userName, List<Like> like, List<Comment> comments) {
         this.caption = caption;
-        this.dateCreated = dateCreated;
+        this.datePosted = datePosted;
         this.imagePath = imagePath;
         this.imageId = imageId;
         this.userId = userId;
@@ -33,29 +33,6 @@ public class Photo implements Parcelable {
         this.comments = comments;
     }
 
-    private Photo(Parcel in) {
-        caption = in.readString();
-        dateCreated = in.readString();
-        imagePath = in.readString();
-        imageId = in.readString();
-        userId = in.readString();
-        tags = in.readString();
-        userDisplayName = in.readString();
-        userName = in.readString();
-    }
-
-    public static final Creator<Photo> CREATOR = new Creator<Photo>() {
-        @Override
-        public Photo createFromParcel(Parcel in) {
-            return new Photo(in);
-        }
-
-        @Override
-        public Photo[] newArray(int size) {
-            return new Photo[size];
-        }
-    };
-
     public String getCaption() {
         return caption;
     }
@@ -64,12 +41,12 @@ public class Photo implements Parcelable {
         this.caption = caption;
     }
 
-    public String getDateCreated() {
-        return dateCreated;
+    public String getDatePosted() {
+        return datePosted;
     }
 
-    public void setDateCreated(String dateCreated) {
-        this.dateCreated = dateCreated;
+    public void setDatePosted(String datePosted) {
+        this.datePosted = datePosted;
     }
 
     public String getImagePath() {
@@ -136,6 +113,33 @@ public class Photo implements Parcelable {
         this.comments = comments;
     }
 
+    public static Creator<Photo> getCREATOR() {
+        return CREATOR;
+    }
+
+    protected Photo(Parcel in) {
+        caption = in.readString();
+        datePosted = in.readString();
+        imagePath = in.readString();
+        imageId = in.readString();
+        userId = in.readString();
+        tags = in.readString();
+        userDisplayName = in.readString();
+        userName = in.readString();
+    }
+
+    public static final Creator<Photo> CREATOR = new Creator<Photo>() {
+        @Override
+        public Photo createFromParcel(Parcel in) {
+            return new Photo(in);
+        }
+
+        @Override
+        public Photo[] newArray(int size) {
+            return new Photo[size];
+        }
+    };
+
     @Override
     public int describeContents() {
         return 0;
@@ -144,7 +148,7 @@ public class Photo implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(caption);
-        dest.writeString(dateCreated);
+        dest.writeString(datePosted);
         dest.writeString(imagePath);
         dest.writeString(imageId);
         dest.writeString(userId);

@@ -19,8 +19,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.seluhadu.shchat.adapters.ViewPagerAdapter;
-import com.seluhadu.shchat.dialogs.DialogNewPost;
-import com.seluhadu.shchat.fragments.ChatFragment;
 import com.seluhadu.shchat.fragments.HomeFragment;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -59,17 +57,20 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 //                mFireBaseAuth.signOut();
 //                sendToSignIn();
-                DialogNewPost dialogNewPost= new DialogNewPost();
-                dialogNewPost.show(getSupportFragmentManager(), dialogNewPost.getTag());
+                Intent intent = new Intent(MainActivity.this, UserSettings.class);
+                startActivity(intent);
+//                DialogNewPost dialogNewPost= new DialogNewPost();
+//                dialogNewPost.show(getSupportFragmentManager(), dialogNewPost.getTag());
             }
         });
-       dialog = new Dialog(this);
-       dialog.setTitle("This");
+        dialog = new Dialog(this);
+        dialog.setTitle("This");
         ViewPager mViewPager = findViewById(R.id.main_view_pager);
         mTabLayout = findViewById(R.id.main_tab);
 //        mUserName = findViewById(R.id.user_name);
-        setUpWitViewPager(mViewPager);
+
         if (mFireBaseAuth.getCurrentUser() != null) {
+            setUpWitViewPager(mViewPager);
             String currentUserId = mFireBaseAuth.getCurrentUser().getUid();
             DocumentReference dr = mFireBaseFireStore.collection(getResources().getString(R.string.users)).document(currentUserId);
             dr.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -110,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     private void setUpWitViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new HomeFragment(), "Home");
-        adapter.addFragment(new ChatFragment(), "Chat");
+        adapter.addFragment(new HomeFragment(), "Chat");
         adapter.addFragment(new HomeFragment(), "Active");
         adapter.addFragment(new HomeFragment(), "Groups");
         adapter.addFragment(new HomeFragment(), "Calls");

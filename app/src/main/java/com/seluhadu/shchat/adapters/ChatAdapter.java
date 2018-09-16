@@ -8,62 +8,99 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.seluhadu.shchat.R;
 import com.seluhadu.shchat.models.BaseMessage;
-import com.seluhadu.shchat.models.User;
+import com.seluhadu.shchat.models.FileMessage;
+import com.seluhadu.shchat.models.UserMessage;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ItemHolder> {
-    private static final int VIEW_TYPE_USER_MESSAGE = 10;
-    private static final int VIEW_TYPE_FILE_MESSAGE = 20;
+public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private static final int VIEW_TYPE_USER_MESSAGE_ME = 10;
+    private static final int VIEW_TYPE_USER_MESSAGE_OTHER = 11;
+
+    private static final int VIEW_TYPE_FILE_MESSAGE_ME = 20;
+    private static final int VIEW_TYPE_FILE_MESSAGE_OTHER = 21;
+
+    private static final int VIEW_TYPE_FILE_MESSAGE_IMAGE_ME = 22;
+    private static final int VIEW_TYPE_FILE_MESSAGE_IMAGE_OTHER = 23;
+
+    private static final int VIEW_TYPE_FILE_MESSAGE_VIDEO_ME = 24;
+    private static final int VIEW_TYPE_FILE_MESSAGE_VIDEO_OTHER = 25;
 
     private Context mContext;
-    private ArrayList<BaseMessage> mMessage;
+    private List<BaseMessage> mMessages;
     private OnItemClickListener onItemClickListener;
     private OnItemLongClickListener onItemLongClickListener;
 
-    public ChatAdapter(Context mContext, ArrayList<BaseMessage> Message) {
+    public ChatAdapter(Context mContext) {
         this.mContext = mContext;
-        this.mMessage = Message;
+        mMessages = new ArrayList<>();
     }
 
     @NonNull
     @Override
-    public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View rootView = LayoutInflater.from(mContext).inflate(R.layout.item_chat_user, parent, false);
-        return new ItemHolder(rootView);
+        return null;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ItemHolder holder, int position) {
-//        User user = users.get(position);
-//        holder.userName.setText(user.getUserDisplayName());
-//        holder.userActive.setText(user.getUserDisplayName());
-//        Glide.with(mContext).load(user.getUserProfile()).into(holder.userProfile);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        BaseMessage baseMessage = mMessages.get(position);
+        if (baseMessage instanceof UserMessage) {
+            UserMessage userMessage = (UserMessage) baseMessage;
+            return userMessage.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) ?
+                    VIEW_TYPE_USER_MESSAGE_ME : VIEW_TYPE_USER_MESSAGE_OTHER;
+        } else if (baseMessage instanceof FileMessage) {
+            FileMessage fillMessage = (FileMessage) baseMessage;
+            if (fillMessage.getType().startsWith("image")) {
+                return fillMessage.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) ?
+                        VIEW_TYPE_FILE_MESSAGE_IMAGE_ME : VIEW_TYPE_FILE_MESSAGE_IMAGE_OTHER;
+            } else if (fillMessage.getType().startsWith("video")) {
+                return fillMessage.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) ?
+                        VIEW_TYPE_FILE_MESSAGE_VIDEO_ME : VIEW_TYPE_FILE_MESSAGE_VIDEO_OTHER;
+            } else {
+                return fillMessage.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) ?
+                        VIEW_TYPE_FILE_MESSAGE_ME : VIEW_TYPE_FILE_MESSAGE_OTHER;
+            }
+        }
+        return -1;
     }
 
     @Override
     public int getItemCount() {
-        return mMessage != null ? mMessage.size() : 0;
+        return mMessages != null ? mMessages.size() : 0;
     }
 
-    void addFirst(BaseMessage baseMessage) {
-        mMessage.add(0, baseMessage);
+    public void setMessages(List<BaseMessage> Messages) {
+        this.mMessages = Messages;
+    }
+
+    public void addFirst(BaseMessage baseMessage) {
+        mMessages.add(0, baseMessage);
         notifyDataSetChanged();
     }
 
-    void addLast(BaseMessage message) {
-        mMessage.add(message);
+   public void addLast(BaseMessage message) {
+        mMessages.add(message);
         notifyDataSetChanged();
     }
 
     void delete(long msgId) {
-        for (BaseMessage message : mMessage) {
-            if (message.getmMessageId() == msgId) {
-                mMessage.remove(message);
+        for (BaseMessage message : mMessages) {
+            if (message.getMessageId() == msgId) {
+                mMessages.remove(message);
                 notifyDataSetChanged();
                 break;
             }
@@ -72,60 +109,68 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ItemHolder> {
 
     void update(BaseMessage message) {
         BaseMessage baseMessage;
-        for (int i = 0; i < mMessage.size(); i++) {
-            baseMessage = mMessage.get(i);
-            if (message.getmMessageId() == baseMessage.getmMessageId()) {
-                mMessage.remove(i);
-                mMessage.add(i, message);
+        for (int i = 0; i < mMessages.size(); i++) {
+            baseMessage = mMessages.get(i);
+            if (message.getMessageId() == baseMessage.getMessageId()) {
+                mMessages.remove(i);
+                mMessages.add(i, message);
                 notifyDataSetChanged();
                 break;
             }
         }
     }
 
-    public void setUsers(ArrayList<User> message) {
-        this.mMessage = mMessage;
-        notifyDataSetChanged();
-    }
-
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
-    }
-
-    public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
-        this.onItemLongClickListener = onItemLongClickListener;
-    }
-
-    class ItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    class MyUserMessageHolder extends RecyclerView.ViewHolder {
         private CircleImageView userProfile;
         private TextView userName;
         private TextView userActive;
 
-        ItemHolder(View itemView) {
+        MyUserMessageHolder(View itemView) {
             super(itemView);
             this.userActive = itemView.findViewById(R.id.user_active);
             this.userProfile = itemView.findViewById(R.id.user_profile);
             this.userName = itemView.findViewById(R.id.user_name);
         }
 
-        @Override
-        public void onClick(View v) {
-            if (onItemClickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
-                onItemClickListener.OnItemClick(v, getAdapterPosition());
-            }
+        void bind(Context context, BaseMessage baseMessage, int position, boolean isNewDay) {
+
+        }
+    }
+
+    class OtherUserMessageHolder extends RecyclerView.ViewHolder {
+        private CircleImageView userProfile;
+        private TextView userName;
+        private TextView userActive;
+
+        OtherUserMessageHolder(View itemView) {
+            super(itemView);
+            this.userActive = itemView.findViewById(R.id.user_active);
+            this.userProfile = itemView.findViewById(R.id.user_profile);
+            this.userName = itemView.findViewById(R.id.user_name);
         }
 
-        @Override
-        public boolean onLongClick(View v) {
-            return ((onItemLongClickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION) && onItemLongClickListener.OnItemLongClick(v, getAdapterPosition()));
+        void bind(Context context, BaseMessage baseMessage, int position, boolean isNewDay) {
+
         }
     }
 
     public interface OnItemClickListener {
-        void OnItemClick(View view, int position);
+        void onUserMessageItemClick(UserMessage message, int position);
+
+        void onFileMessageItemClick(FileMessage message, int position);
     }
 
     public interface OnItemLongClickListener {
-        boolean OnItemLongClick(View view, int position);
+        boolean onUserMessageItemLongClick(UserMessage message, int position);
+
+        boolean onFileMessageItemLongClick(FileMessage message, int position);
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
+        this.onItemLongClickListener = onItemLongClickListener;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 }

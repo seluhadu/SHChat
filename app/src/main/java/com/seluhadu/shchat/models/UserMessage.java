@@ -1,1 +1,1 @@
-package com.seluhadu.shchat.models;public class UserMessage extends BaseMessage {    public UserMessage(long mMessageId, long mCreatedAt, long mUpdatedAt, String userId) {        super(mMessageId, mCreatedAt, mUpdatedAt, userId);    }}
+package com.seluhadu.shchat.models;public class UserMessage extends BaseMessage {    private String message = "";    public UserMessage() {    }    public String getMessage() {        return message;    }    public void setMessage(String message) {        this.message = message;    }}

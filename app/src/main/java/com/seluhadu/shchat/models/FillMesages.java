@@ -1,1 +1,0 @@
-package com.seluhadu.shchat.models;public class FillMesages extends BaseMessage {    public FillMesages(long mMessageId, long mCreatedAt, long mUpdatedAt, String userId) {        super(mMessageId, mCreatedAt, mUpdatedAt, userId);    }}

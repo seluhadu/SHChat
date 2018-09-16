@@ -5,14 +5,20 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.seluhadu.shchat.models.FileMessage;
 import com.seluhadu.shchat.models.Photo;
+import com.seluhadu.shchat.models.UserMessage;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -111,5 +117,54 @@ public class FireBaseMethods {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
         return stream.toByteArray();
+    }
+
+    public UserMessage sendUserMessage(String message, String userId, String customType, SendUserMessageHandler handler) {
+        UserMessage userMessage = new UserMessage();
+        return userMessage;
+    }
+
+    public FileMessage sendFileMessage(File file, String name, String type, Integer size, String seder, final SendFileMessageHandler handler) {
+        if (file == null) {
+            if (handler != null) {
+                handler.onSent((FileMessage) null, new Exception("Invalid arguments."));
+                return null;
+            }
+        } else {
+            if (name == null || name.length() == 0) {
+                name = file.getName();
+            }
+            if (type == null || type.length() == 0) {
+                type = "";
+            }
+            if (size == null) {
+                size = (int) file.length();
+            }
+        }
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+        final FileMessage fileMessage = new FileMessage(null, FirebaseAuth.getInstance().getCurrentUser().getUid(), "", name, size, type, "", null);
+        firebaseFirestore.collection("Messages").document(seder).collection("Chat").document().set(fileMessage).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                if (handler != null) {
+                    handler.onSent(fileMessage, null);
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+
+        return fileMessage;
+    }
+
+    public interface SendUserMessageHandler {
+        void onSent(UserMessage message, Exception e);
+    }
+
+    public interface SendFileMessageHandler {
+        void onSent(FileMessage message, Exception e);
     }
 }
