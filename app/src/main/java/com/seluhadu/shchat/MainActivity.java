@@ -20,6 +20,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.seluhadu.shchat.adapters.ViewPagerAdapter;
 import com.seluhadu.shchat.fragments.HomeFragment;
+import com.seluhadu.shchat.fragments.ListChatFragment;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
     private void setUpWitViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new HomeFragment(), "Home");
-        adapter.addFragment(new HomeFragment(), "Chat");
+        adapter.addFragment(new ListChatFragment(), "Chat");
         adapter.addFragment(new HomeFragment(), "Active");
         adapter.addFragment(new HomeFragment(), "Groups");
         adapter.addFragment(new HomeFragment(), "Calls");

@@ -3,13 +3,16 @@ package com.seluhadu.shchat;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.text.TextUtils;
@@ -37,6 +40,7 @@ import com.google.firebase.storage.UploadTask;
 import com.seluhadu.shchat.models.User;
 import com.seluhadu.shchat.utils.FireBaseMethods;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -54,7 +58,6 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseFirestore mFireBaseFireStore;
     private StorageReference mStorageReference;
     private EditText mEmail, mPassword, mConfirm, mUserName;
-    private AppCompatButton mSignUp;
     private CircleImageView mCircleImageView;
     private Uri mProfileUri;
     private String userId;
@@ -73,7 +76,7 @@ public class SignUpActivity extends AppCompatActivity {
         mFireBaseAuth = FirebaseAuth.getInstance();
         mFireBaseFireStore = FirebaseFirestore.getInstance();
         mStorageReference = FirebaseStorage.getInstance().getReference();
-        mSignUp = findViewById(R.id.sign_up);
+        AppCompatButton mSignUp = findViewById(R.id.sign_up);
         mEmail = findViewById(R.id.email);
         mCircleImageView = findViewById(R.id.profile);
         mCircleImageView.setOnClickListener(new View.OnClickListener() {
@@ -96,10 +99,7 @@ public class SignUpActivity extends AppCompatActivity {
         mConfirm = findViewById(R.id.confirm);
         mProgressDialog = new ProgressDialog(this);
         mUserName = findViewById(R.id.name);
-//        mEmail.addTextChangedListener(textWatcher);
-//        mPassword.addTextChangedListener(textWatcher);
-//        mConfirm.addTextChangedListener(textWatcher);
-//        mUserName.addTextChangedListener(textWatcher);
+
         mSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,35 +111,40 @@ public class SignUpActivity extends AppCompatActivity {
         } else {
             askPermission(permissionsRequired);
         }
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[0]) != PackageManager.PERMISSION_GRANTED ||
-//                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[1]) != PackageManager.PERMISSION_GRANTED ||
-//                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[2]) != PackageManager.PERMISSION_GRANTED ||
-//                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[3]) != PackageManager.PERMISSION_GRANTED) {
-//                if (ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[0]) ||
-//                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[1]) ||
-//                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[2]) ||
-//                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[3])) {
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//                    builder.setCancelable(true);
-//                    builder.setMessage("Read External Storage is necessary to upload picture! \n " +
-//                            "Internet is necessary to load and upload content! \n " +
-//                            "Write External Storage is necessary to download to your phone!");
-//                    builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            ActivityCompat.requestPermissions(SignUpActivity.this, permissionsRequired, PERMISSION_REQUEST);
-//                        }
-//                    });
-//
-//                } else {
-//                    ActivityCompat.requestPermissions(SignUpActivity.this, permissionsRequired, PERMISSION_REQUEST);
-//                }
-//            } else {
-//                // Do some stuff
-//
-//            }
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[0]) != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[1]) != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[2]) != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(SignUpActivity.this, permissionsRequired[3]) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[0]) ||
+                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[1]) ||
+                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[2]) ||
+                        ActivityCompat.shouldShowRequestPermissionRationale(SignUpActivity.this, permissionsRequired[3])) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setCancelable(true);
+                    builder.setMessage("Read External Storage is necessary to upload picture! \n " +
+                            "Internet is necessary to load and upload content! \n " +
+                            "Write External Storage is necessary to download file to your phone!");
+                    builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case DialogInterface.BUTTON_NEGATIVE:
+
+                                case DialogInterface.BUTTON_NEUTRAL:
+                            }
+                            ActivityCompat.requestPermissions(SignUpActivity.this, permissionsRequired, PERMISSION_REQUEST);
+                        }
+                    });
+
+                } else {
+                    ActivityCompat.requestPermissions(SignUpActivity.this, permissionsRequired, PERMISSION_REQUEST);
+                }
+            } else {
+                // Do some stuff
+
+            }
+        }
 
     }
 
@@ -199,7 +204,6 @@ public class SignUpActivity extends AppCompatActivity {
                                 user.setUserId(userId);
                                 user.setUserEmail(userEmail);
                                 user.setUserProfile("");
-                                User users = new User(FireBaseMethods.replaceWithDot(name), userId, "", userEmail, name);
                                 mFireBaseFireStore.collection(getResources().getString(R.string.users)).document(userId).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
@@ -359,6 +363,7 @@ public class SignUpActivity extends AppCompatActivity {
     private String getExtension(Uri uri) {
         ContentResolver cr = getContentResolver();
         MimeTypeMap mtm = MimeTypeMap.getSingleton();
+
         return mtm.getMimeTypeFromExtension(cr.getType(uri));
     }
 
@@ -373,8 +378,15 @@ public class SignUpActivity extends AppCompatActivity {
         switch (requestCode) {
             case PERMISSION_REQUEST:
                 if (grantResults.length > 0) {
+                    HashMap<String, Integer> key = new HashMap<>();
                     for (int i = 0; i < grantResults.length; i++) {
+                        key.put(permissions[i], grantResults[i]);
+                        if (key.get(permissions[i]) == PackageManager.PERMISSION_GRANTED) {
 
+                        } else {
+                            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[i])) {
+                            }
+                        }
                     }
                 }
         }

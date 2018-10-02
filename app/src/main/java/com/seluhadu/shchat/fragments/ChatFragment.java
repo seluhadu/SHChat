@@ -18,7 +18,6 @@ import android.widget.ImageButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
 import com.seluhadu.shchat.R;
 import com.seluhadu.shchat.adapters.ChatAdapter;
 import com.seluhadu.shchat.chat_interactore.ChatContractor;
@@ -54,6 +53,7 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mFireBaseFireStore = FirebaseFirestore.getInstance();
         mFireBaseAuth = FirebaseAuth.getInstance();
     }
 
@@ -63,7 +63,6 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_chat, container, false);
         mRecyclerView = rootView.findViewById(R.id.chat_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setHasFixedSize(true);
         adapter = new ChatAdapter(getActivity());
         mRecyclerView.setAdapter(adapter);
         sendMessage = rootView.findViewById(R.id.send_message);
@@ -76,9 +75,9 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.toString().length()!=0){
+                if (s.toString().length() != 0) {
                     sendMessage.setEnabled(true);
-                }else sendMessage.setEnabled(false);
+                } else sendMessage.setEnabled(false);
             }
 
             @Override
@@ -94,22 +93,6 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
                 sendMessage();
             }
         });
-        mFireBaseFireStore = FirebaseFirestore.getInstance();
-        String userId = mFireBaseAuth.getCurrentUser().getUid();
-        Query query = mFireBaseFireStore.collection(getString(R.string.users))
-                .document(userId).collection("Chats");
-//        mListenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
-//            @Override
-//            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
-//                                @javax.annotation.Nullable FirebaseFirestoreException e) {
-//                if (e != null) {
-//                    Log.w(TAG, "onEvent: error", e);
-//                }
-//                for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
-//
-//                }
-//            }
-//        });
         return rootView;
     }
 
@@ -124,7 +107,7 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mListenerRegistration.remove();
+        if (mListenerRegistration != null) mListenerRegistration.remove();
     }
 
     @Override
@@ -139,10 +122,6 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
 
     @Override
     public void onGetMessageSuccess(BaseMessage message) {
-        if (adapter == null) {
-            adapter = new ChatAdapter(getActivity());
-            mRecyclerView.setAdapter(adapter);
-        }
         adapter.addLast(message);
     }
 
@@ -153,13 +132,17 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
 
     private void sendMessage() {
         String message = mEditTextMessage.getText().toString();
-        if (!TextUtils.isEmpty(message)){
+        if (!TextUtils.isEmpty(message)) {
             UserMessage userMessage = new UserMessage();
             userMessage.setMessage(message);
+            userMessage.setCreatedAt(System.currentTimeMillis());
+            userMessage.setMessageId(System.currentTimeMillis());
             userMessage.setUserId(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            userMessage.setMessage(String.valueOf(System.currentTimeMillis()));
             userMessage.setReceiverId(getArguments().getString("receiverId"));
             userMessage.setMsgType("UMSG");
+            mEditTextMessage.setText("");
+            adapter.addLast(userMessage);
+            chatPresenter.sendMessage(getActivity(), userMessage, getArguments().getString("receiverId"));
         }
     }
 }

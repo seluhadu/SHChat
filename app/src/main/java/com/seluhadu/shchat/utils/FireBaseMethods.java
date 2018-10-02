@@ -48,7 +48,7 @@ public class FireBaseMethods {
         Photo photo = new Photo();
         String newImageKey = firebaseFirestore.collection("UsersModel").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Posts").document().getId();
         photo.setImageId(newImageKey);
-        photo.setDateCreated(getTimestamp());
+        photo.setDatePosted(getTimestamp());
         photo.setCaption(caption);
         photo.setImagePath(url);
         photo.setTags(""); // need to add tag
@@ -119,15 +119,22 @@ public class FireBaseMethods {
         return stream.toByteArray();
     }
 
-    public UserMessage sendUserMessage(String message, String userId, String customType, SendUserMessageHandler handler) {
+    public UserMessage sendUserMessage(String message, String userId, String customType, String receiverId, SendUserMessageHandler handler) {
+        String createdAt = DateUtil.formatDate(System.currentTimeMillis());
         UserMessage userMessage = new UserMessage();
+        userMessage.setMessageId(System.currentTimeMillis());
+        userMessage.setMessage(message);
+        userMessage.setCreatedAt(Long.valueOf(createdAt));
+        userMessage.setReceiverId(receiverId);
+        userMessage.setUserId(userId);
+        userMessage.setMsgType("UM");
         return userMessage;
     }
 
-    public FileMessage sendFileMessage(File file, String name, String type, Integer size, String seder, final SendFileMessageHandler handler) {
+    public FileMessage sendFileMessage(final File file, String name, String type, Integer size, String seder, final SendFileMessageHandler handler) {
         if (file == null) {
             if (handler != null) {
-                handler.onSent((FileMessage) null, new Exception("Invalid arguments."));
+                handler.onSent((FileMessage) null, "fill is null");
                 return null;
             }
         } else {
@@ -153,7 +160,9 @@ public class FireBaseMethods {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-
+                if (handler != null) {
+                    handler.onSent(null, e.getMessage());
+                }
             }
         });
 
@@ -165,6 +174,6 @@ public class FireBaseMethods {
     }
 
     public interface SendFileMessageHandler {
-        void onSent(FileMessage message, Exception e);
+        void onSent(FileMessage message, String e);
     }
 }

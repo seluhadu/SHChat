@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,13 +47,22 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View rootView = LayoutInflater.from(mContext).inflate(R.layout.item_chat_user, parent, false);
-        return null;
+        switch (viewType) {
+            case VIEW_TYPE_USER_MESSAGE_ME:
+                View rootView = LayoutInflater.from(mContext).inflate(R.layout.item_message_sent, parent, false);
+                return new MyUserMessageHolder(rootView);
+            default:
+                return null;
+        }
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
+        BaseMessage baseMessage = mMessages.get(position);
+        switch (getItemViewType(position)) {
+            case VIEW_TYPE_USER_MESSAGE_ME:
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, false);
+        }
     }
 
     @Override
@@ -92,7 +102,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         notifyDataSetChanged();
     }
 
-   public void addLast(BaseMessage message) {
+    public void addLast(BaseMessage message) {
         mMessages.add(message);
         notifyDataSetChanged();
     }
@@ -121,24 +131,28 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     class MyUserMessageHolder extends RecyclerView.ViewHolder {
-        private CircleImageView userProfile;
+        private ImageView userProfile;
+        private TextView mMessage;
         private TextView userName;
         private TextView userActive;
+        View view = itemView;
 
         MyUserMessageHolder(View itemView) {
             super(itemView);
             this.userActive = itemView.findViewById(R.id.user_active);
             this.userProfile = itemView.findViewById(R.id.user_profile);
             this.userName = itemView.findViewById(R.id.user_name);
+            this.mMessage = itemView.findViewById(R.id.message);
         }
 
-        void bind(Context context, BaseMessage baseMessage, int position, boolean isNewDay) {
-
+        void bind(Context context, UserMessage userMessage, int position, boolean isNewDay) {
+            mMessage.setText(userMessage.getMessage());
         }
     }
 
     class OtherUserMessageHolder extends RecyclerView.ViewHolder {
         private CircleImageView userProfile;
+        private TextView mMessage;
         private TextView userName;
         private TextView userActive;
 
@@ -150,7 +164,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void bind(Context context, BaseMessage baseMessage, int position, boolean isNewDay) {
-
         }
     }
 

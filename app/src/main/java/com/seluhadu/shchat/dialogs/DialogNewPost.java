@@ -112,7 +112,7 @@ public class DialogNewPost extends DialogFragment {
                             final Photo photo = new Photo();
                             photo.setCaption(caption);
                             photo.setUserId(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                            photo.setDateCreated(date);
+                            photo.setDatePosted(date);
                             photo.setImageId(postId);
                             photo.setImagePath(uri.toString());
                             mFireBaseFireStore.collection(getString(R.string.userPosts))//UserPosts for each person
