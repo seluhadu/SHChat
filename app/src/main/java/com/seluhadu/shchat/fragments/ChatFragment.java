@@ -90,7 +90,7 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
         sendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendMessage();
+//                sendMessage();
             }
         });
         return rootView;
@@ -130,19 +130,19 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
 
     }
 
-    private void sendMessage() {
-        String message = mEditTextMessage.getText().toString();
-        if (!TextUtils.isEmpty(message)) {
-            UserMessage userMessage = new UserMessage();
-            userMessage.setMessage(message);
-            userMessage.setCreatedAt(System.currentTimeMillis());
-            userMessage.setMessageId(System.currentTimeMillis());
-            userMessage.setUserId(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            userMessage.setReceiverId(getArguments().getString("receiverId"));
-            userMessage.setMsgType("UMSG");
-            mEditTextMessage.setText("");
-            adapter.addLast(userMessage);
-            chatPresenter.sendMessage(getActivity(), userMessage, getArguments().getString("receiverId"));
-        }
-    }
+//    private void sendMessage() {
+//        String message = mEditTextMessage.getText().toString();
+//        if (!TextUtils.isEmpty(message)) {
+//            UserMessage userMessage = new UserMessage();
+//            userMessage.setMessage(message);
+//            userMessage.setCreatedAt(System.currentTimeMillis());
+//            userMessage.setMessageId(System.currentTimeMillis());
+//            userMessage.setUserId(FirebaseAuth.getInstance().getCurrentUser().getUid());
+//            userMessage.setReceiverId(getArguments().getString("receiverId"));
+//            userMessage.setMsgType("UMSG");
+//            mEditTextMessage.setText("");
+//            adapter.addLast(userMessage);
+//            chatPresenter.sendMessage(getActivity(), userMessage, getArguments().getString("receiverId"));
+//        }
+//    }
 }
