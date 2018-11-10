@@ -14,7 +14,9 @@ import com.seluhadu.shchat.R;
 import com.seluhadu.shchat.models.BaseMessage;
 import com.seluhadu.shchat.models.FileMessage;
 import com.seluhadu.shchat.models.UserMessage;
+import com.seluhadu.shchat.utils.DateUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +51,32 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case VIEW_TYPE_USER_MESSAGE_ME:
-                View rootView = LayoutInflater.from(mContext).inflate(R.layout.item_message_sent, parent, false);
-                return new MyUserMessageHolder(rootView);
+                View userMsgME = LayoutInflater.from(mContext).inflate(R.layout.item_message_sent, parent, false);
+                return new MyUserMessageHolder(userMsgME);
+            case VIEW_TYPE_USER_MESSAGE_OTHER:
+                View userMagOther = LayoutInflater.from(mContext).inflate(R.layout.item_message_sent, parent, false);
+                return new MyUserMessageHolder(userMagOther);
+
+            case VIEW_TYPE_FILE_MESSAGE_ME:
+                View fileMsgMe = LayoutInflater.from(mContext).inflate(R.layout.item_message_sent, parent, false);
+                return new MyUserMessageHolder(fileMsgMe);
+            case VIEW_TYPE_FILE_MESSAGE_OTHER:
+                View fileMsgOther = LayoutInflater.from(mContext).inflate(R.layout.item_message_sent, parent, false);
+                return new MyUserMessageHolder(fileMsgOther);
+
+            case VIEW_TYPE_FILE_MESSAGE_IMAGE_ME:
+                View fileMsgImgMe = LayoutInflater.from(mContext).inflate(R.layout.item_message_sent, parent, false);
+                return new MyUserMessageHolder(fileMsgImgMe);
+            case VIEW_TYPE_FILE_MESSAGE_IMAGE_OTHER:
+                View fileMsgImgOther = LayoutInflater.from(mContext).inflate(R.layout.item_message_sent, parent, false);
+                return new MyUserMessageHolder(fileMsgImgOther);
+
+            case VIEW_TYPE_FILE_MESSAGE_VIDEO_ME:
+                View fileMsgVideoMe = LayoutInflater.from(mContext).inflate(R.layout.item_message_sent, parent, false);
+                return new MyUserMessageHolder(fileMsgVideoMe);
+            case VIEW_TYPE_FILE_MESSAGE_VIDEO_OTHER:
+                View fileMsgVideoOther = LayoutInflater.from(mContext).inflate(R.layout.item_message_sent, parent, false);
+                return new MyUserMessageHolder(fileMsgVideoOther);
             default:
                 return null;
         }
@@ -59,10 +85,57 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         BaseMessage baseMessage = mMessages.get(position);
+        boolean isContinuous = false;
+        boolean isNewDay = false;
+        if (position == mMessages.size() - 1) {
+            BaseMessage prevMsg = mMessages.get(position + 1);
+            if (!DateUtil.hasSameDate(baseMessage.getCreatedAt(), prevMsg.getCreatedAt())) {
+                isNewDay = true;
+                isContinuous = false;
+            } else {
+                isContinuous = isContinuous(baseMessage, prevMsg);
+            }
+        }
+
         switch (getItemViewType(position)) {
             case VIEW_TYPE_USER_MESSAGE_ME:
-                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, false);
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+            case VIEW_TYPE_USER_MESSAGE_OTHER:
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+
+            case VIEW_TYPE_FILE_MESSAGE_ME:
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+            case VIEW_TYPE_FILE_MESSAGE_OTHER:
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+
+            case VIEW_TYPE_FILE_MESSAGE_IMAGE_ME:
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+            case VIEW_TYPE_FILE_MESSAGE_IMAGE_OTHER:
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+
+            case VIEW_TYPE_FILE_MESSAGE_VIDEO_ME:
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+            case VIEW_TYPE_FILE_MESSAGE_VIDEO_OTHER:
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
         }
+    }
+
+    private boolean isContinuous(BaseMessage currentMsg, BaseMessage precedingMsg) {
+        if (currentMsg == null || precedingMsg == null) return false;
+
+        String currentUser = null, precedingUser = null;
+        if (currentMsg instanceof UserMessage) {
+            currentUser = ((UserMessage) currentMsg).getUserId();
+        } else if (currentMsg instanceof FileMessage) {
+            currentUser = ((FileMessage) currentMsg).getUserId();
+        }
+
+        if (precedingMsg instanceof UserMessage) {
+            precedingUser = ((UserMessage) precedingMsg).getUserId();
+        } else if (precedingMsg instanceof FileMessage) {
+            precedingUser = ((FileMessage) precedingMsg).getUserId();
+        }
+        return !(currentUser == null || precedingUser == null) & currentUser.equals(precedingUser);
     }
 
     @Override
