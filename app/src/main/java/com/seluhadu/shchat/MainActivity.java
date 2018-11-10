@@ -21,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.seluhadu.shchat.adapters.ViewPagerAdapter;
 import com.seluhadu.shchat.fragments.HomeFragment;
 import com.seluhadu.shchat.fragments.ListChatFragment;
+import com.seluhadu.shchat.notification.TestActivity;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 //                mFireBaseAuth.signOut();
 //                sendToSignIn();
-                Intent intent = new Intent(MainActivity.this, UserSettings.class);
+                Intent intent = new Intent(MainActivity.this, TestActivity.class);
                 startActivity(intent);
 //                DialogNewPost dialogNewPost= new DialogNewPost();
 //                dialogNewPost.show(getSupportFragmentManager(), dialogNewPost.getTag());
