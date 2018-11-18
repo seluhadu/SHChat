@@ -15,8 +15,8 @@ import com.seluhadu.shchat.models.BaseMessage;
 import com.seluhadu.shchat.models.FileMessage;
 import com.seluhadu.shchat.models.UserMessage;
 import com.seluhadu.shchat.utils.DateUtil;
+import com.seluhadu.shchat.utils.FireBaseMethods;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +40,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<BaseMessage> mMessages;
     private OnItemClickListener onItemClickListener;
     private OnItemLongClickListener onItemLongClickListener;
+    private FireBaseMethods fireBaseMethods;
 
     public ChatAdapter(Context mContext) {
         this.mContext = mContext;
@@ -99,24 +100,24 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         switch (getItemViewType(position)) {
             case VIEW_TYPE_USER_MESSAGE_ME:
-                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay, isContinuous);
             case VIEW_TYPE_USER_MESSAGE_OTHER:
-                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay, isContinuous);
 
             case VIEW_TYPE_FILE_MESSAGE_ME:
-                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay, isContinuous);
             case VIEW_TYPE_FILE_MESSAGE_OTHER:
-                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay, isContinuous);
 
             case VIEW_TYPE_FILE_MESSAGE_IMAGE_ME:
-                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay, isContinuous);
             case VIEW_TYPE_FILE_MESSAGE_IMAGE_OTHER:
-                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay, isContinuous);
 
             case VIEW_TYPE_FILE_MESSAGE_VIDEO_ME:
-                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay, isContinuous);
             case VIEW_TYPE_FILE_MESSAGE_VIDEO_OTHER:
-                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay);
+                ((MyUserMessageHolder) holder).bind(mContext, (UserMessage) baseMessage, position, isNewDay, isContinuous);
         }
     }
 
@@ -203,6 +204,25 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    public void loadMsg(int position, int limit, final FireBaseMethods.GetMessagesHandler handler) {
+        fireBaseMethods.getMessages(FirebaseAuth.getInstance().getCurrentUser().getUid(), mMessages.get(position).getReceiverId(), limit, new FireBaseMethods.GetMessagesHandler() {
+            @Override
+            public void onResult(List<BaseMessage> messageList, Exception e) {
+                if (handler != null) {
+                    handler.onResult(messageList, e);
+                }
+                if (e != null) {
+                    e.printStackTrace();
+                    return;
+                }
+                mMessages.clear();
+                for (BaseMessage bm : messageList) {
+                    mMessages.add(bm);
+                }
+            }
+        });
+    }
+
     class MyUserMessageHolder extends RecyclerView.ViewHolder {
         private ImageView userProfile;
         private TextView mMessage;
@@ -218,7 +238,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.mMessage = itemView.findViewById(R.id.message);
         }
 
-        void bind(Context context, UserMessage userMessage, int position, boolean isNewDay) {
+        void bind(Context context, UserMessage userMessage, int position, boolean isNewDay, boolean isContunuios) {
             mMessage.setText(userMessage.getMessage());
         }
     }

@@ -19,6 +19,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -35,6 +36,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -164,7 +168,7 @@ public class FireBaseMethods {
                 size = (int) file.length();
             }
         }
-         String utl = "";
+        String utl = "";
         final StorageReference storageReference = FirebaseStorage.getInstance().getReference();
         storageReference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -176,7 +180,7 @@ public class FireBaseMethods {
                 });
             }
         });
-        final FileMessage fileMessage = new FileMessage(FileMessage.build(null, FirebaseAuth.getInstance().getCurrentUser().getUid(), "", "", name, size, type, "", null, System.currentTimeMillis(), 0l, System.currentTimeMillis()));
+        final FileMessage fileMessage = new FileMessage(FileMessage.build(FirebaseAuth.getInstance().getCurrentUser().getUid(), "", "", name, size, type, "", null, System.currentTimeMillis(), 0l, System.currentTimeMillis()));
         firebaseFirestore.collection("Messages").document(seder).collection("Chat").document().set(fileMessage).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -195,7 +199,8 @@ public class FireBaseMethods {
 
         return fileMessage;
     }
-    public void getMesages(final String senderId, final String receiverId, final GetMessagesHandler handler) {
+
+    public void getMessages(final String senderId, final String receiverId, final int limit, final GetMessagesHandler handler) {
         final String currentIdToReceiver = senderId + "_" + receiverId;
         final String receiverToCurrentId = receiverId + "_" + senderId;
         final FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
@@ -204,14 +209,14 @@ public class FireBaseMethods {
             @Override
             public void onSuccess(final DocumentSnapshot documentSnapshot) {
                 if (documentSnapshot.exists()) {
-                    getMessagesByTimestamp(currentIdToReceiver, senderId,receiverId, handler);
+                    getMessagesByTimestamp(currentIdToReceiver, senderId, receiverId, handler, limit);
                 } else {
                     DocumentReference documentReference = firebaseFirestore.collection("Messages").document(receiverToCurrentId);
                     documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
                             if (documentSnapshot.exists()) {
-                                getMessagesByTimestamp(receiverToCurrentId, senderId,receiverId, handler);
+                                getMessagesByTimestamp(receiverToCurrentId, senderId, receiverId, handler, limit);
                             }
                         }
                     });
@@ -224,25 +229,31 @@ public class FireBaseMethods {
             }
         });
     }
-    public void getMessagesByTimestamp(String usersId, final String senderId, final String receiverId, final GetMessagesHandler handler) {
+
+    public void getMessagesByTimestamp(String usersId, final String senderId, final String receiverId, final GetMessagesHandler handler, int limit) {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         CollectionReference collectionReference = firebaseFirestore.collection("Message").document(usersId).collection("Chat");
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        Query query = collectionReference.limit(limit);
+        query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 ArrayList<BaseMessage> messages = new ArrayList<>();
 
                 for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
-                    BaseMessage baseMessage = BaseMessage.build(documentChange, senderId,receiverId);
-                    if (baseMessage!=null){
+                    BaseMessage baseMessage = BaseMessage.build(documentChange, senderId, receiverId);
+                    if (baseMessage != null) {
                         messages.add(baseMessage);
                     }
                 }
-                if (handler!=null){
+                if (handler != null) {
                     handler.onResult(messages, null);
                 }
             }
         });
+    }
+
+    public void sortIds(String ids[]) {
+
     }
 
     public interface SendUserMessageHandler {
@@ -252,6 +263,7 @@ public class FireBaseMethods {
     public interface SendFileMessageHandler {
         void onSent(FileMessage message, String e);
     }
+
     public interface GetMessagesHandler {
         void onResult(List<BaseMessage> messageList, Exception e);
     }
