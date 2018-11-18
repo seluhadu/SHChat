@@ -202,7 +202,25 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
         }
     }
+    public interface OnItemClickListener {
+        void onUserMessageItemClick(UserMessage message, int position);
 
+        void onFileMessageItemClick(FileMessage message, int position);
+    }
+
+    public interface OnItemLongClickListener {
+        boolean onUserMessageItemLongClick(UserMessage message, int position);
+
+        boolean onFileMessageItemLongClick(FileMessage message, int position);
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
+        this.onItemLongClickListener = onItemLongClickListener;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
     class MyUserMessageHolder extends RecyclerView.ViewHolder {
         private ImageView userProfile;
         private TextView mMessage;
@@ -239,24 +257,37 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void bind(Context context, BaseMessage baseMessage, int position, boolean isNewDay) {
         }
     }
+    class MyFileMessageHolderMe extends RecyclerView.ViewHolder {
+        private CircleImageView userProfile;
+        private TextView mMessage;
+        private TextView userName;
+        private TextView userActive;
 
-    public interface OnItemClickListener {
-        void onUserMessageItemClick(UserMessage message, int position);
+        MyFileMessageHolderMe(View itemView) {
+            super(itemView);
+            this.userActive = itemView.findViewById(R.id.user_active);
+            this.userProfile = itemView.findViewById(R.id.user_profile);
+            this.userName = itemView.findViewById(R.id.user_name);
+        }
 
-        void onFileMessageItemClick(FileMessage message, int position);
+        void bind(Context context, BaseMessage baseMessage, int position, boolean isNewDay) {
+        }
     }
 
-    public interface OnItemLongClickListener {
-        boolean onUserMessageItemLongClick(UserMessage message, int position);
+    class MyFileMessageHolderOther extends RecyclerView.ViewHolder {
+        private CircleImageView userProfile;
+        private TextView mMessage;
+        private TextView userName;
+        private TextView userActive;
 
-        boolean onFileMessageItemLongClick(FileMessage message, int position);
-    }
+        MyFileMessageHolderOther(View itemView) {
+            super(itemView);
+            this.userActive = itemView.findViewById(R.id.user_active);
+            this.userProfile = itemView.findViewById(R.id.user_profile);
+            this.userName = itemView.findViewById(R.id.user_name);
+        }
 
-    public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
-        this.onItemLongClickListener = onItemLongClickListener;
-    }
-
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
+        void bind(Context context, BaseMessage baseMessage, int position, boolean isNewDay) {
+        }
     }
 }

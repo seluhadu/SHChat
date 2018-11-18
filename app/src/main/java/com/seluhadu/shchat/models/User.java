@@ -3,6 +3,9 @@ package com.seluhadu.shchat.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.HashMap;
+import java.util.Objects;
+
 public class User implements Parcelable {
 
     private String userName;
@@ -10,20 +13,32 @@ public class User implements Parcelable {
     private String userProfile;
     private String userEmail;
     private String UserDisplayName;
-    private long mLastSeenAt;
-    private boolean mIsActive = true;
-    private @UserMode.userMode int currentMode;
+    private long lastSeenAt;
+    private boolean isActive = true;
+    private @UserMode.userMode
+    int currentMode;
 
 
     public User() {
     }
 
-    public User(String userName, String userId, String userProfile, String userEmail, String userDisplayName) {
-        this.userName = userName;
-        this.userId = userId;
-        this.userProfile = userProfile;
-        this.userEmail = userEmail;
-        this.UserDisplayName = userDisplayName;
+    public HashMap<String, Object> build(String userName, String userId, String userProfile, String userEmail, String userDisplayName, boolean isActive, boolean isOnline, long lastSeenAt) {
+        HashMap<String, Object> obj = new HashMap<>();
+        obj.put("userId", userId);
+        obj.put("userName", userName);
+        obj.put("userProfile", userProfile);
+        obj.put("userEmail", userEmail);
+        obj.put("userDisplayName", userDisplayName);
+        obj.put("isActive", isActive);
+        obj.put("isOnline", isOnline);
+        obj.put("lastSeenAt", lastSeenAt);
+        return obj;
+    }
+
+    User(HashMap<String, Object> obj) {
+        if (obj.containsKey("userId")){
+            this.userId = obj.get("userId").toString();
+        }
     }
 
     public String getUserDisplayName() {
@@ -92,6 +107,7 @@ public class User implements Parcelable {
     public void setCurrentMode(@UserMode.userMode int currentMode) {
         this.currentMode = currentMode;
     }
+
     @UserMode.userMode
     public int getCurrentMode() {
         return currentMode;
