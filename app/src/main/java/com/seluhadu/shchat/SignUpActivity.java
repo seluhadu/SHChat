@@ -261,28 +261,6 @@ public class SignUpActivity extends AppCompatActivity {
         Log.d(TAG, "showErrorMessage: " + errorMessage);
     }
 
-//    private TextWatcher textWatcher = new TextWatcher() {
-//        @Override
-//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//        }
-//
-//        @Override
-//        public void onTextChanged(CharSequence s, int start, int before, int count) {
-//            boolean fieldsOK = validate(new EditText[]{mEmail, mUserName, mPassword, mConfirm});
-//            if (s.toString().trim().length() > 0&& fieldsOK) {
-//                mSignUp.setEnabled(true);
-//            } else {
-//                mSignUp.setEnabled(false);
-//            }
-//        }
-//
-//        @Override
-//        public void afterTextChanged(Editable s) {
-//
-//        }
-//    };
-
     private void sendToMain() {
         Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

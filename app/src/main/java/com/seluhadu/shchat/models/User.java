@@ -15,8 +15,6 @@ public class User implements Parcelable {
     private String UserDisplayName;
     private long lastSeenAt;
     private boolean isActive = true;
-    private @UserMode.userMode
-    int currentMode;
 
 
     public User() {
@@ -102,15 +100,6 @@ public class User implements Parcelable {
 
     public void setUserProfile(String userProfile) {
         this.userProfile = userProfile;
-    }
-
-    public void setCurrentMode(@UserMode.userMode int currentMode) {
-        this.currentMode = currentMode;
-    }
-
-    @UserMode.userMode
-    public int getCurrentMode() {
-        return currentMode;
     }
 
     @Override

@@ -24,8 +24,11 @@ import com.seluhadu.shchat.chat_interactore.ChatContractor;
 import com.seluhadu.shchat.chat_interactore.ChatPresenter;
 import com.seluhadu.shchat.models.BaseMessage;
 import com.seluhadu.shchat.models.UserMessage;
+import com.seluhadu.shchat.utils.FireBaseMethods;
 
-public class ChatFragment extends Fragment implements ChatContractor.view {
+import java.util.List;
+
+public class ChatFragment extends Fragment {
     private static final String TAG = "ChatFragment";
 
     private FirebaseFirestore mFireBaseFireStore;
@@ -36,6 +39,7 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
     private EditText mEditTextMessage;
     ListenerRegistration mListenerRegistration;
     private ImageButton sendMessage;
+    private LinearLayoutManager manager;
 
     public ChatFragment() {
     }
@@ -62,9 +66,18 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_chat, container, false);
         mRecyclerView = rootView.findViewById(R.id.chat_recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        manager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(manager);
         adapter = new ChatAdapter(getActivity());
         mRecyclerView.setAdapter(adapter);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (manager.findLastVisibleItemPosition() == adapter.getItemCount() - 1) {
+
+                }
+            }
+        });
         sendMessage = rootView.findViewById(R.id.send_message);
         mEditTextMessage = rootView.findViewById(R.id.etm);
         mEditTextMessage.addTextChangedListener(new TextWatcher() {
@@ -99,9 +112,12 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        chatPresenter = new ChatPresenter(this);
-        chatPresenter.getMessage(FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                getArguments().getString("receiverId"));
+        adapter.loadMsg(getArguments().getString("receiverId"), 20, new FireBaseMethods.GetMessagesHandler() {
+            @Override
+            public void onResult(List<BaseMessage> messageList, Exception e) {
+
+            }
+        });
     }
 
     @Override
@@ -110,39 +126,4 @@ public class ChatFragment extends Fragment implements ChatContractor.view {
         if (mListenerRegistration != null) mListenerRegistration.remove();
     }
 
-    @Override
-    public void onSendMessageSuccess() {
-
-    }
-
-    @Override
-    public void onSendMessageFailure(String error) {
-
-    }
-
-    @Override
-    public void onGetMessageSuccess(BaseMessage message) {
-        adapter.addLast(message);
-    }
-
-    @Override
-    public void onGetMessageFailure(String error) {
-
-    }
-
-//    private void sendMessage() {
-//        String message = mEditTextMessage.getText().toString();
-//        if (!TextUtils.isEmpty(message)) {
-//            UserMessage userMessage = new UserMessage();
-//            userMessage.setMessage(message);
-//            userMessage.setCreatedAt(System.currentTimeMillis());
-//            userMessage.setMessageId(System.currentTimeMillis());
-//            userMessage.setUserId(FirebaseAuth.getInstance().getCurrentUser().getUid());
-//            userMessage.setReceiverId(getArguments().getString("receiverId"));
-//            userMessage.setMsgType("UMSG");
-//            mEditTextMessage.setText("");
-//            adapter.addLast(userMessage);
-//            chatPresenter.sendMessage(getActivity(), userMessage, getArguments().getString("receiverId"));
-//        }
-//    }
 }
