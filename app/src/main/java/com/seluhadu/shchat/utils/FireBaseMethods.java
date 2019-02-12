@@ -146,22 +146,22 @@ public class FireBaseMethods {
         });
     }
     public static void deleteUserMessage(@NonNull String receiverId, @NonNull final UserMessage message, final OnUserMessageDeleteHandler deleteHandler) {
-       FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-       firebaseFirestore.collection("Messages").document(sortedUsersId(FirebaseAuth.getInstance().getCurrentUser().getUid(), receiverId))
-               .collection("Chats")
-               .document(String.valueOf(message.getMessageId()))
-               .delete()
-               .addOnSuccessListener(new OnSuccessListener<Void>() {
-                   @Override
-                   public void onSuccess(Void aVoid) {
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseFirestore.collection("Messages").document(sortedUsersId(FirebaseAuth.getInstance().getCurrentUser().getUid(), receiverId))
+                .collection("Chats")
+                .document(String.valueOf(message.getMessageId()))
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
                         deleteHandler.onMessageDelete(message, null);
-                   }
-               }).addOnFailureListener(new OnFailureListener() {
-           @Override
-           public void onFailure(@NonNull Exception e) {
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
                 deleteHandler.onMessageDelete(null, e.getMessage());
-           }
-       });
+            }
+        });
     }
 
     public static UserMessage sendUserMessage(String userId, String receiverId, String message, long newDay, FireBaseMethods.SendUserMessageHandler handler) {
