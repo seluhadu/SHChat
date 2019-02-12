@@ -19,6 +19,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.seluhadu.shchat.adapters.ViewPagerAdapter;
+import com.seluhadu.shchat.animation.AnimationActivity;
 import com.seluhadu.shchat.fragments.HomeFragment;
 import com.seluhadu.shchat.fragments.ListChatFragment;
 import com.seluhadu.shchat.notification.TestActivity;
@@ -57,10 +58,10 @@ public class MainActivity extends AppCompatActivity {
         mProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mFireBaseAuth.signOut();
-//                sendToSignIn();
-                Intent intent = new Intent(MainActivity.this, TestActivity.class);
-                startActivity(intent);
+                mFireBaseAuth.signOut();
+                sendToSignIn();
+//                Intent intent = new Intent(MainActivity.this, AnimationActivity.class);
+//                startActivity(intent);
 //                DialogNewPost dialogNewPost= new DialogNewPost();
 //                dialogNewPost.show(getSupportFragmentManager(), dialogNewPost.getTag());
             }
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                             String userProfile = documentSnapshot.get("userProfile").toString();
                             Uri uri = Uri.parse(userProfile);
 //                            mUserName.setText(userName);
-                            Glide.with(MainActivity.this).load(uri).into(mProfile);
+                            Glide.with(getApplicationContext()).load(uri).into(mProfile);
                         } else {
 //                            mUserName.setText(getResources().getString(R.string.unknown));
                         }

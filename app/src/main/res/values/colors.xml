@@ -22,4 +22,5 @@
     <color name="gray">#f8f8fb</color>
     <color name="border">#07ca87</color>
     <color name="received_background">#ebf2f7</color>
-></resources>
+    <color name="touch_bg">#000000</color>
+    ></resources>

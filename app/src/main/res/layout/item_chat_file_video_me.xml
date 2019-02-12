@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/dateContainer"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal">
@@ -20,7 +20,7 @@
             android:background="@android:color/darker_gray" />
 
         <TextView
-            android:id="@+id/textView8"
+            android:id="@+id/new_day_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -51,7 +51,7 @@
         android:layout_marginEnd="8dp"
         app:cardCornerRadius="@dimen/dp10"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+        app:layout_constraintTop_toBottomOf="@+id/dateContainer">
 
         <LinearLayout
             android:layout_width="wrap_content"

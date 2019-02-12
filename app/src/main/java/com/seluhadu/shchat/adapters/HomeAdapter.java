@@ -32,7 +32,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ItemHolder> {
     private Context mContext;
     private ArrayList<Photo> posts;
     private FirebaseFirestore mFireBaseFireStore;
-    private DocumentReference mDocumentReference;
 
     public HomeAdapter(Context mContext, ArrayList<Photo> posts) {
         this.mContext = mContext;
@@ -90,6 +89,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ItemHolder> {
     @Override
     public int getItemCount() {
         return posts != null ? posts.size() : 0;
+    }
+
+    public void setContext(Context mContext) {
+        this.mContext = mContext;
     }
 
     class ItemHolder extends RecyclerView.ViewHolder {

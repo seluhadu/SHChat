@@ -52,7 +52,7 @@ public class HomeFragment extends Fragment {
         mRecyclerView = rootView.findViewById(R.id.home_recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerAdapter = new HomeAdapter(getContext(), mPhotos);
+        recyclerAdapter = new HomeAdapter(getActivity(), mPhotos);
         mRecyclerView.setAdapter(recyclerAdapter);
         mFireBaseFireStore.collection(getResources().getString(R.string.posts))/*.orderBy("datePosted", Query.Direction.ASCENDING)*/
                 .addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
@@ -74,5 +74,11 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        recyclerAdapter.setContext(getActivity());
     }
 }

@@ -1,72 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/chat_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <LinearLayout
-            android:id="@+id/touch_outside"
-            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:alpha=".3"
-            android:background="#000000"
-            android:orientation="vertical"
-            android:visibility="gone" />
-    </FrameLayout>
+            android:layout_marginBottom="?attr/actionBarSize"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+    </android.support.design.widget.CoordinatorLayout>
+
 
     <LinearLayout
+        android:id="@+id/bottom_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@android:color/white"
-        android:orientation="vertical">
+        android:layout_alignParentBottom="true"
+        android:background="#fff"
+        android:orientation="horizontal">
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            app:cardCornerRadius="5dp"
-            app:cardElevation="0dp">
+        <ImageButton
+            android:id="@+id/more_option"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_add_circle" />
 
-        </android.support.v7.widget.CardView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <EditText
+            android:inputType="textCapSentences|textMultiLine"
+            android:id="@+id/etm"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:elevation="8dp"
-            android:orientation="horizontal">
+            android:minHeight="30dp"
+            android:imeOptions="flagNoExtractUi"
+            android:maxHeight="60dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:background="@drawable/search_back"
+            android:hint="Message..." />
 
-            <ImageButton
-                android:id="@+id/more_vertical"
-                android:layout_width="?attr/actionBarSize"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_add_circle" />
-
-            <EditText
-                android:id="@+id/etm"
-                android:layout_width="0dp"
-                android:layout_height="38dp"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:background="@drawable/search_back"
-                android:hint="Message..."
-                android:inputType="textCapSentences" />
-
-            <ImageButton
-                android:id="@+id/send_message"
-                android:layout_width="?attr/actionBarSize"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_send" />
-        </LinearLayout>
+        <ImageButton
+            android:id="@+id/send_message"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_send" />
     </LinearLayout>
-</FrameLayout>
+</RelativeLayout>
