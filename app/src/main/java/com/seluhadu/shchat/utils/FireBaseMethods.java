@@ -3,7 +3,7 @@ package com.seluhadu.shchat.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -28,14 +28,9 @@ import com.seluhadu.shchat.models.UserMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import javax.annotation.Nullable;
-
-import static android.support.constraint.Constraints.TAG;
-import static android.view.View.inflate;
 
 public class FireBaseMethods {
     private static String url;

@@ -4,10 +4,10 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import com.google.android.material.tabs.TabLayout;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -19,10 +19,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.seluhadu.shchat.adapters.ViewPagerAdapter;
-import com.seluhadu.shchat.animation.AnimationActivity;
 import com.seluhadu.shchat.fragments.HomeFragment;
 import com.seluhadu.shchat.fragments.ListChatFragment;
-import com.seluhadu.shchat.notification.TestActivity;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
