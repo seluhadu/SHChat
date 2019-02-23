@@ -3,8 +3,10 @@ package com.seluhadu.shchat.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
+import com.seluhadu.shchat.SeluHaduApp;
 
 
 public class PreferenceUtils {

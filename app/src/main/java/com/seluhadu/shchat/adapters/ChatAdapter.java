@@ -1,10 +1,10 @@
 package com.seluhadu.shchat.adapters;
 
 import android.content.Context;
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.recyclerview.widget.RecyclerView;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +22,7 @@ import com.seluhadu.shchat.models.FileMessage;
 import com.seluhadu.shchat.models.UserMessage;
 import com.seluhadu.shchat.utils.DateUtil;
 import com.seluhadu.shchat.utils.FireBaseMethods;
+import com.seluhadu.shchat.utils.ImageUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -336,6 +337,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+
     public interface OnItemClickListener {
         void onUserMessageItemClick(UserMessage message, int position);
 
@@ -423,7 +425,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.dateContainer = itemView.findViewById(R.id.dateContainer);
         }
 
-        void bind(Context context, UserMessage message, int position, boolean isNewDay, boolean isContunuios) {
+        void bind(Context context, UserMessage message, int position, boolean isNewDay, boolean isContinuous) {
             mMessage.setText(message.getMessage());
             Glide.with(mContext).load(message.getMessage()).into(mUserProfile);
             if (message.getUpdatedAt() > 0) {
@@ -436,6 +438,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 mDateUploaded.setText(DateUtil.formatDateTime(message.getNewDate()));
             } else {
                 dateContainer.setVisibility(View.GONE);
+            }
+            if (isContinuous) {
+                mUserProfile.setVisibility(View.INVISIBLE);
+            } else {
+                ImageUtils.displayImageFromUrl(mContext, mUserProfile, message.getUser().getUserProfile(), mContext.getResources().getDrawable(R.drawable.default_profile), null);
             }
         }
     }

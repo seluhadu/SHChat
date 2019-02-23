@@ -4,10 +4,10 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.tabs.TabLayout;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
+import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private CircleImageView mProfile;
     private ImageButton mMoreVertical;
     Dialog dialog;
+    private ViewPagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,20 +54,18 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
         mProfile = findViewById(R.id.user_profile);
-        mProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mFireBaseAuth.signOut();
-                sendToSignIn();
+        mProfile.setOnClickListener(v -> {
+            mFireBaseAuth.signOut();
+            sendToSignIn();
 //                Intent intent = new Intent(MainActivity.this, AnimationActivity.class);
 //                startActivity(intent);
 //                DialogNewPost dialogNewPost= new DialogNewPost();
 //                dialogNewPost.show(getSupportFragmentManager(), dialogNewPost.getTag());
-            }
         });
         dialog = new Dialog(this);
         dialog.setTitle("This");
         ViewPager mViewPager = findViewById(R.id.main_view_pager);
+        pagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         mTabLayout = findViewById(R.id.main_tab);
 //        mUserName = findViewById(R.id.user_name);
 
@@ -74,20 +73,17 @@ public class MainActivity extends AppCompatActivity {
             setUpWitViewPager(mViewPager);
             String currentUserId = mFireBaseAuth.getCurrentUser().getUid();
             DocumentReference dr = mFireBaseFireStore.collection(getResources().getString(R.string.users)).document(currentUserId);
-            dr.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot documentSnapshot = task.getResult();
-                        if (documentSnapshot.exists()) {
-                            String userName = documentSnapshot.get("userDisplayName").toString();
-                            String userProfile = documentSnapshot.get("userProfile").toString();
-                            Uri uri = Uri.parse(userProfile);
+            dr.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    if (documentSnapshot.exists()) {
+                        String userName = documentSnapshot.get("userDisplayName").toString();
+                        String userProfile = documentSnapshot.get("userProfile").toString();
+                        Uri uri = Uri.parse(userProfile);
 //                            mUserName.setText(userName);
-                            Glide.with(getApplicationContext()).load(uri).into(mProfile);
-                        } else {
+                        Glide.with(getApplicationContext()).load(uri).into(mProfile);
+                    } else {
 //                            mUserName.setText(getResources().getString(R.string.unknown));
-                        }
                     }
                 }
             });
@@ -110,13 +106,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpWitViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new HomeFragment(), "Home");
-        adapter.addFragment(new ListChatFragment(), "Chat");
-        adapter.addFragment(new HomeFragment(), "Active");
-        adapter.addFragment(new HomeFragment(), "Groups");
-        adapter.addFragment(new HomeFragment(), "Calls");
+        pagerAdapter.addFragment(new HomeFragment(), "Home");
+        pagerAdapter.addFragment(new ListChatFragment(), "Chat");
         mTabLayout.setupWithViewPager(viewPager);
-        viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(pagerAdapter.getCount());
+        viewPager.setAdapter(pagerAdapter);
     }
 }

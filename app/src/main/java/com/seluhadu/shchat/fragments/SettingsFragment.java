@@ -2,7 +2,7 @@ package com.seluhadu.shchat.fragments;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 import com.seluhadu.shchat.R;
 
 public class SettingsFragment extends PreferenceFragment {

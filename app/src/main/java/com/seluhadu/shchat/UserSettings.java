@@ -1,10 +1,10 @@
 package com.seluhadu.shchat;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import com.google.android.material.tabs.TabLayout;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -35,6 +35,6 @@ public class UserSettings extends AppCompatActivity {
         adapter.addFragment(new HomeFragment(), "Likes");
         mTabLayout.setupWithViewPager(viewPager);
         viewPager.setAdapter(adapter);
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(adapter.getCount());
     }
 }

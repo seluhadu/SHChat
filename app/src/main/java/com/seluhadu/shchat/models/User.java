@@ -2,9 +2,21 @@ package com.seluhadu.shchat.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.util.Log;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Objects;
+
+import static android.support.constraint.Constraints.TAG;
 
 public class User implements Parcelable {
 
@@ -34,7 +46,7 @@ public class User implements Parcelable {
     }
 
     User(HashMap<String, Object> obj) {
-        if (obj.containsKey("userId")){
+        if (obj.containsKey("userId")) {
             this.userId = obj.get("userId").toString();
         }
     }
@@ -103,17 +115,6 @@ public class User implements Parcelable {
     }
 
     @Override
-    public String toString() {
-        return "User{" +
-                "userName='" + userName + '\'' +
-                ", userId='" + userId + '\'' +
-                ", userProfile='" + userProfile + '\'' +
-                ", userEmail='" + userEmail + '\'' +
-                ", UserDisplayName='" + UserDisplayName + '\'' +
-                '}';
-    }
-
-    @Override
     public int describeContents() {
         return 0;
     }
@@ -124,5 +125,27 @@ public class User implements Parcelable {
         dest.writeString(userId);
         dest.writeString(userProfile);
         dest.writeString(userEmail);
+    }
+    public static User getUserFromId(final String userId) {
+        final User user = new User();
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+        final DocumentReference dr = firebaseFirestore.collection("Users").document(userId);
+        dr.get().addOnSuccessListener(documentSnapshot -> {
+            user.setUserId(documentSnapshot.get("userId").toString());
+            Log.d(TAG, "profile: " + documentSnapshot.get("userProfile"));
+            user.setUserName(documentSnapshot.get("userName").toString());
+            user.setUserProfile(documentSnapshot.get("userProfile").toString());
+            user.setUserDisplayName(documentSnapshot.get("userDisplayName").toString());
+        });
+        return user;
+    }
+    public static class UserBuilder {
+        private String userName;
+        private String userId;
+        private String userProfile;
+        private String userEmail;
+        private String UserDisplayName;
+        private long lastSeenAt;
+        private boolean isActive = true;
     }
 }

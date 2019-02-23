@@ -1,8 +1,8 @@
 package com.seluhadu.shchat.adapters;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static androidx.constraintlayout.Constraints.TAG;
+import static android.support.constraint.Constraints.TAG;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ItemHolder> {
     private Context mContext;
@@ -51,7 +51,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ItemHolder> {
         getProfileAndName(holder, position);
         //image posted
         Photo photo = posts.get(position);
-        Glide.with(mContext).load(photo.getImagePath()).into(holder.mPostImage);
+        Glide.with(mContext).load(photo.getImageUrl()).into(holder.mPostImage);
         holder.mThumpsUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

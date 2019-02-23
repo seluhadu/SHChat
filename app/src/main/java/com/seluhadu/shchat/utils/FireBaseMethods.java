@@ -3,7 +3,7 @@ package com.seluhadu.shchat.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -23,6 +24,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.seluhadu.shchat.models.BaseMessage;
 import com.seluhadu.shchat.models.FileMessage;
+import com.seluhadu.shchat.models.User;
 import com.seluhadu.shchat.models.UserMessage;
 
 import java.io.ByteArrayOutputStream;
@@ -30,7 +32,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 
 public class FireBaseMethods {
     private static String url;
@@ -68,7 +69,7 @@ public class FireBaseMethods {
 //        photo.setImageId(newImageKey);
 //        photo.setDatePosted(getTimestamp());
 //        photo.setCaption(caption);
-//        photo.setImagePath(url);
+//        photo.setImageUrl(url);
 //        photo.setTags(""); // need to add tag
 //        photo.setUserId(FirebaseAuth.getInstance().getCurrentUser().getUid());
 //
@@ -130,7 +131,8 @@ public class FireBaseMethods {
         bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
         return stream.toByteArray();
     }
-    public static void deleteField(@NonNull String userId, @NonNull String documentId, @NonNull String field){
+
+    public static void deleteField(@NonNull String userId, @NonNull String documentId, @NonNull String field) {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         DocumentReference documentReference = firebaseFirestore.collection("Messages").document(userId).collection("Chats").document(documentId);
         documentReference.update(field, FieldValue.delete()).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -140,6 +142,7 @@ public class FireBaseMethods {
             }
         });
     }
+
     public static void deleteUserMessage(@NonNull String receiverId, @NonNull final UserMessage message, final OnUserMessageDeleteHandler deleteHandler) {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseFirestore.collection("Messages").document(sortedUsersId(FirebaseAuth.getInstance().getCurrentUser().getUid(), receiverId))
@@ -161,6 +164,36 @@ public class FireBaseMethods {
 
     public static UserMessage sendUserMessage(String userId, String receiverId, String message, long newDay, FireBaseMethods.SendUserMessageHandler handler) {
         return sendUserMessage(userId, receiverId, message, System.currentTimeMillis(), 0, newDay, handler);
+    }
+
+//    public static User getUser(String userId) {
+//        getUser(userId, new OnGetUserHandler() {
+//            @Override
+//            public User onGetUser(User user, String e) {
+//                return user;
+//            }
+//        });
+//        return null;
+//    }
+
+    public static User getUser(final String userId) {
+        final User user = new User();
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+        final DocumentReference dr = firebaseFirestore.collection("Users").document(userId);
+        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                user.setUserName(documentSnapshot.get("userName").toString());
+                user.setUserId(documentSnapshot.get("userId").toString());
+                user.setUserProfile(documentSnapshot.get("userProfile").toString());
+                user.setUserDisplayName(documentSnapshot.get("userDisplayName").toString());
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+            }
+        });
+        return user;
     }
 
     private static UserMessage sendUserMessage(String userId, String receiverId, String message, long createdAt, long updatedAt, long newDay, final FireBaseMethods.SendUserMessageHandler handler) {
@@ -287,7 +320,12 @@ public class FireBaseMethods {
     public interface GetMessagesHandler {
         void onResult(List<BaseMessage> messageList, Exception e);
     }
+
     public interface OnUserMessageDeleteHandler {
         void onMessageDelete(UserMessage message, String e);
+    }
+
+    public interface OnGetUserHandler {
+        User onGetUser(User user, String e);
     }
 }

@@ -5,7 +5,7 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -36,12 +36,17 @@
         <activity android:name=".UserSettings" />
         <activity android:name=".notification.NotificationActivity" />
         <activity android:name=".ProfileActivity" />
-        <activity android:name=".ChatActivity" android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".notification.TestActivity"
+        <activity
+            android:name=".ChatActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".notification.TestActivity"
             android:screenOrientation="locked"
-            android:theme="@style/NoFullscreen"/>
+            android:theme="@style/NoFullscreen" />
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".animation.AnimationActivity" />
+        <activity android:name=".multi_edittext.EditTextActivity" />
+        <activity android:name=".permission.PermissionActivity" />
 
         <receiver android:name=".notification.NotificationReceiver" />
         <service android:name=".background.UploadService" />

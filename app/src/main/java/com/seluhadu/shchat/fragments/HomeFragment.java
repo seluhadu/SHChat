@@ -1,14 +1,15 @@
 package com.seluhadu.shchat.fragments;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
@@ -30,8 +31,10 @@ public class HomeFragment extends Fragment {
     private FirebaseFirestore mFireBaseFireStore;
     private StorageReference mStorageReference;
     private RecyclerView mRecyclerView;
+    private RecyclerView mFeedRecyclerView;
     private ArrayList<Photo> mPhotos;
     private HomeAdapter recyclerAdapter;
+    private ProgressBar mProgressBar;
 
     public HomeFragment() {
     }
@@ -39,36 +42,47 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mFireBaseAuth = FirebaseAuth.getInstance();
+        mFireBaseFireStore = FirebaseFirestore.getInstance();
+        mStorageReference = FirebaseStorage.getInstance().getReference();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_home, container, false);
-        mFireBaseAuth = FirebaseAuth.getInstance();
-        mFireBaseFireStore = FirebaseFirestore.getInstance();
-        mStorageReference = FirebaseStorage.getInstance().getReference();
         mPhotos = new ArrayList<>();
-        mRecyclerView = rootView.findViewById(R.id.home_recycler_view);
+        inti(rootView);
+        getData();
+        return rootView;
+    }
+
+    private void inti(View view) {
+        mRecyclerView = view.findViewById(R.id.home_recycler_view);
+        mFeedRecyclerView = view.findViewById(R.id.feed_recycler_view);
+        mFeedRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        mProgressBar = view.findViewById(R.id.progress_bar);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerAdapter = new HomeAdapter(getActivity(), mPhotos);
         mRecyclerView.setAdapter(recyclerAdapter);
+    }
+
+    private void getData() {
         mFireBaseFireStore.collection(getResources().getString(R.string.posts))/*.orderBy("datePosted", Query.Direction.ASCENDING)*/
-                .addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
-                                @javax.annotation.Nullable FirebaseFirestoreException e) {
-                for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
-                    if (documentChange.getType() == DocumentChange.Type.ADDED) {
-                        Photo photo = documentChange.getDocument().toObject(Photo.class);
-                        mPhotos.add(photo);
-                        recyclerAdapter.notifyDataSetChanged();
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
+                                        @javax.annotation.Nullable FirebaseFirestoreException e) {
+                        for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
+                            if (documentChange.getType() == DocumentChange.Type.ADDED) {
+                                Photo photo = documentChange.getDocument().toObject(Photo.class);
+                                mPhotos.add(photo);
+                                recyclerAdapter.notifyDataSetChanged();
+                            }
+                        }
                     }
-                }
-            }
-        });
-        return rootView;
+                });
     }
 
     @Override

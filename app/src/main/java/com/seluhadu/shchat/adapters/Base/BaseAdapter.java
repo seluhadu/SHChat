@@ -1,8 +1,8 @@
 package com.seluhadu.shchat.adapters.Base;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +14,12 @@ public abstract class BaseAdapter<VH extends RecyclerView.ViewHolder, Model> ext
     protected ArrayList<Model> mData;
     private Context mContext;
 
-    public BaseAdapter(ArrayList<Model> mData, Context mContext) {
-        this.mData = mData;
+    public BaseAdapter(ArrayList<Model> data, Context mContext) {
+        this.mData = data;
         this.mContext = mContext;
     }
 
-    public ArrayList<Model> getData() {
+    protected ArrayList<Model> getData() {
         return mData;
     }
 

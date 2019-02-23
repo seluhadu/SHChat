@@ -13,7 +13,7 @@ public class ImageUtils {
     private ImageUtils() {
     }
 
-    public static void displayImageFromUrl(final Context context, final ImageView imageView, final String url, Drawable placeHolder, RequestListener requestListener, boolean isGif) {
+    public static void displayImageFromUrl(final Context context, final ImageView imageView, final String url, Drawable placeHolder, RequestListener requestListener) {
         RequestOptions requestOptions = new RequestOptions()
                 .dontAnimate()
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
