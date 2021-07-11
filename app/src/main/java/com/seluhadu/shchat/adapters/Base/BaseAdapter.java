@@ -1,8 +1,8 @@
 package com.seluhadu.shchat.adapters.Base;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 
 public abstract class BaseAdapter<VH extends RecyclerView.ViewHolder, Model> extends RecyclerView.Adapter<VH> {
-    protected ArrayList<Model> mData;
+    private ArrayList<Model> mData;
     private Context mContext;
 
     public BaseAdapter(ArrayList<Model> data, Context mContext) {
@@ -44,7 +44,7 @@ public abstract class BaseAdapter<VH extends RecyclerView.ViewHolder, Model> ext
         return mData == null ? 0 : mData.size();
     }
 
-    protected abstract int getLayoutId(int viewType);
+    abstract int getLayoutId(int viewType);
 
-    protected abstract VH getViewHolder(View itemView, int viewType);
+    abstract VH getViewHolder(View itemView, int viewType);
 }

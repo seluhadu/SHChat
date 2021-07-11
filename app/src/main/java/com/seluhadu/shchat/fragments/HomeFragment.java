@@ -1,11 +1,11 @@
 package com.seluhadu.shchat.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +13,7 @@ import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.seluhadu.shchat.R;
@@ -70,18 +67,15 @@ public class HomeFragment extends Fragment {
 
     private void getData() {
         mFireBaseFireStore.collection(getResources().getString(R.string.posts))/*.orderBy("datePosted", Query.Direction.ASCENDING)*/
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
-                                        @javax.annotation.Nullable FirebaseFirestoreException e) {
-                        for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
-                            if (documentChange.getType() == DocumentChange.Type.ADDED) {
-                                Photo photo = documentChange.getDocument().toObject(Photo.class);
-                                mPhotos.add(photo);
-                                recyclerAdapter.notifyDataSetChanged();
-                            }
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
+                        if (documentChange.getType() == DocumentChange.Type.ADDED) {
+                            Photo photo = documentChange.getDocument().toObject(Photo.class);
+                            mPhotos.add(photo);
+                            recyclerAdapter.notifyDataSetChanged();
                         }
                     }
+                    hideProgressBar();
                 });
     }
 
@@ -94,5 +88,12 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         recyclerAdapter.setContext(getActivity());
+    }
+
+    private void showProgressBar(){
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+    private void hideProgressBar(){
+        mProgressBar.setVisibility(View.INVISIBLE);
     }
 }

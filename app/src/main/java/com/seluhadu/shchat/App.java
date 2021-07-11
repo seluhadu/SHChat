@@ -2,7 +2,7 @@ package com.seluhadu.shchat;
 
 import android.app.Application;
 
-public class SeluHaduApp extends Application {
+public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();

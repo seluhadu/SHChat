@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chat_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="?attr/actionBarSize"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
     <LinearLayout
@@ -22,34 +23,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#fff"
+        android:background="@android:color/white"
         android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/more_option"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_add_circle" />
+            android:scaleType="fitCenter"
+            android:src="@drawable/add_circular"
+            tools:ignore="ContentDescription" />
 
         <EditText
-            android:inputType="textCapSentences|textMultiLine"
-            android:id="@+id/etm"
+            android:id="@+id/message_input"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minHeight="30dp"
-            android:imeOptions="flagNoExtractUi"
-            android:maxHeight="60dp"
-            android:layout_gravity="center_vertical"
             android:layout_weight="1"
+            android:minHeight="36dp"
             android:background="@drawable/search_back"
-            android:hint="Message..." />
+            android:hint="Message..."
+            android:maxLines="6"
+            android:textSize="14sp"
+            android:layout_gravity="center_vertical"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="textCapSentences|textMultiLine"/>
 
         <ImageButton
             android:id="@+id/send_message"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@null"
             android:src="@drawable/ic_send" />
     </LinearLayout>
 </RelativeLayout>

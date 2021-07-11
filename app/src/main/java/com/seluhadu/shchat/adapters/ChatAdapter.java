@@ -1,10 +1,11 @@
 package com.seluhadu.shchat.adapters;
 
 import android.content.Context;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.recyclerview.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -92,15 +93,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case VIEW_TYPE_USER_MESSAGE_OTHER:
                 View userMagOther = LayoutInflater.from(mContext).inflate(R.layout.item_chat_user_other, parent, false);
                 return new OtherUserMessageHolder(userMagOther);
-            case VIEW_TYPE_FILE_MESSAGE_ME:
-                View fileMsgMe = LayoutInflater.from(mContext).inflate(R.layout.item_chat_file_image_me, parent, false);
-                return new MeUserMessageHolder(fileMsgMe);
-            case VIEW_TYPE_FILE_MESSAGE_OTHER:
-                View fileMsgOther = LayoutInflater.from(mContext).inflate(R.layout.item_chat_file_image_other, parent, false);
-                return new MeUserMessageHolder(fileMsgOther);
             case VIEW_TYPE_FILE_MESSAGE_IMAGE_ME:
                 View fileMsgImgMe = LayoutInflater.from(mContext).inflate(R.layout.item_chat_file_image_me, parent, false);
-                return new MeUserMessageHolder(fileMsgImgMe);
+                return new MeImageMessageHolder(fileMsgImgMe);
             case VIEW_TYPE_FILE_MESSAGE_IMAGE_OTHER:
                 View fileMsgImgOther = LayoutInflater.from(mContext).inflate(R.layout.item_chat_file_image_other, parent, false);
                 return new MeUserMessageHolder(fileMsgImgOther);
@@ -110,6 +105,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case VIEW_TYPE_FILE_MESSAGE_VIDEO_OTHER:
                 View fileMsgVideoOther = LayoutInflater.from(mContext).inflate(R.layout.item_message_sent, parent, false);
                 return new MeUserMessageHolder(fileMsgVideoOther);
+            case VIEW_TYPE_FILE_MESSAGE_ME:
+                View fileMsgMe = LayoutInflater.from(mContext).inflate(R.layout.item_chat_file_image_me, parent, false);
+                return new MeUserMessageHolder(fileMsgMe);
+            case VIEW_TYPE_FILE_MESSAGE_OTHER:
+                View fileMsgOther = LayoutInflater.from(mContext).inflate(R.layout.item_chat_file_image_other, parent, false);
+                return new MeUserMessageHolder(fileMsgOther);
             default:
                 return null;
         }
@@ -146,12 +147,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case VIEW_TYPE_USER_MESSAGE_OTHER:
                 ((OtherUserMessageHolder) holder).bind(mContext, (UserMessage) message, position, isNewDay, isContinuous);
                 break;
-            case VIEW_TYPE_FILE_MESSAGE_ME:
-                ((MeUserMessageHolder) holder).bind(mContext, (UserMessage) message, position, isNewDay, isContinuous);
-                break;
-            case VIEW_TYPE_FILE_MESSAGE_OTHER:
-                ((MeUserMessageHolder) holder).bind(mContext, (UserMessage) message, position, isNewDay, isContinuous);
-                break;
             case VIEW_TYPE_FILE_MESSAGE_IMAGE_ME:
                 ((MeImageMessageHolder) holder).bind(mContext, (FileMessage) message, position, isNewDay, isContinuous);
                 break;
@@ -162,6 +157,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 ((MeUserMessageHolder) holder).bind(mContext, (UserMessage) message, position, isNewDay, isContinuous);
                 break;
             case VIEW_TYPE_FILE_MESSAGE_VIDEO_OTHER:
+                ((MeUserMessageHolder) holder).bind(mContext, (UserMessage) message, position, isNewDay, isContinuous);
+                break;
+            case VIEW_TYPE_FILE_MESSAGE_ME:
+                ((MeUserMessageHolder) holder).bind(mContext, (UserMessage) message, position, isNewDay, isContinuous);
+                break;
+            case VIEW_TYPE_FILE_MESSAGE_OTHER:
                 ((MeUserMessageHolder) holder).bind(mContext, (UserMessage) message, position, isNewDay, isContinuous);
                 break;
             default:
@@ -226,7 +227,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public void addFirst(BaseMessage baseMessage) {
         mMessages.add(0, baseMessage);
-        notifyDataSetChanged();
+        notifyItemInserted(0);
+//        notifyDataSetChanged();
     }
 
     public void addLast(BaseMessage message) {
@@ -257,13 +259,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         for (final BaseMessage message : mMessages) {
             if (message.getMessageId() == msgId) {
                 Snackbar snackbar = Snackbar.make(recyclerView, "Message Deleted!", Snackbar.LENGTH_LONG)
-                        .setAction("Undo", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                mMessages.add(position, message);
-                                notifyItemChanged(position);
-                                recyclerView.scrollToPosition(position);
-                            }
+                        .setAction("Undo", v -> {
+                            mMessages.add(position, message);
+                            notifyItemChanged(position);
+                            recyclerView.scrollToPosition(position);
                         });
                 snackbar.show();
                 mMessages.remove(message);
@@ -359,22 +358,19 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public void loadMsg(final String receiverId, int limit, final FireBaseMethods.GetMessagesHandler handler) {
-        FireBaseMethods.getMessagesByTimestamp(FireBaseMethods.sortedUsersId(FirebaseAuth.getInstance().getCurrentUser().getUid(), receiverId), limit, new FireBaseMethods.GetMessagesHandler() {
-            @Override
-            public void onResult(List<BaseMessage> messageList, Exception e) {
-                if (handler != null) {
-                    handler.onResult(messageList, e);
-                }
-                if (e != null) {
-                    e.printStackTrace();
-                    return;
-                }
-
-                for (BaseMessage message : messageList) {
-                    mMessages.add(message);
-                }
-                notifyDataSetChanged();
+        FireBaseMethods.getMessagesByTimestamp(FireBaseMethods.sortedUsersId(FirebaseAuth.getInstance().getCurrentUser().getUid(), receiverId), limit, (messageList, e) -> {
+            if (handler != null) {
+                handler.onResult(messageList, e);
             }
+            if (e != null) {
+                e.printStackTrace();
+                return;
+            }
+
+            for (BaseMessage message : messageList) {
+                mMessages.add(message);
+            }
+            notifyDataSetChanged();
         });
     }
 
@@ -449,17 +445,31 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     class MeImageMessageHolder extends RecyclerView.ViewHolder {
         private ImageView imageView;
-        private TextView dateUploded;
-        private TextView userActive;
+        private LinearLayout dateContainer;
+        private TextView newDay;
+        private TextView mDateUploaded;
 
         MeImageMessageHolder(View itemView) {
             super(itemView);
             this.imageView = itemView.findViewById(R.id.image);
-            this.dateUploded = itemView.findViewById(R.id.date_posted);
+            this.dateContainer = itemView.findViewById(R.id.dateContainer);
+            this.newDay = itemView.findViewById(R.id.time_stamp);
+            this.mDateUploaded = itemView.findViewById(R.id.new_day_time);
         }
 
         void bind(Context context, FileMessage message, int position, boolean isNewDay, boolean isContinous) {
-            Glide.with(context).load(message.getUrl()).into(this.imageView);
+            if (!TextUtils.isEmpty(message.getUrl())){
+                ImageUtils.displayImageFromUrl(mContext, imageView, message.getUrl(), imageView.getDrawable(), null);
+            }else {
+                ImageUtils.displayImageFromUrl(mContext, imageView, null, mContext.getResources().getDrawable(R.drawable.circular_background), null);
+            }
+            if (isNewDay) {
+                dateContainer.setVisibility(View.VISIBLE);
+                newDay.setText(DateUtil.formatDateTime(message.getNewDate()));
+                Log.d(TAG, "newDate: " + message.getNewDate());
+            } else {
+                dateContainer.setVisibility(View.GONE);
+            }
         }
     }
 

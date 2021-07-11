@@ -4,16 +4,14 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+
+import com.google.android.material.tabs.TabLayout;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.widget.ImageButton;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -21,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.seluhadu.shchat.adapters.ViewPagerAdapter;
 import com.seluhadu.shchat.fragments.HomeFragment;
 import com.seluhadu.shchat.fragments.ListChatFragment;
+import com.seluhadu.shchat.multi_edittext.EditTextActivity;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -30,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout mTabLayout;
     private CircleImageView mProfile;
     private ImageButton mMoreVertical;
-    Dialog dialog;
+    private Dialog dialog;
     private ViewPagerAdapter pagerAdapter;
 
     @Override
@@ -55,10 +54,10 @@ public class MainActivity extends AppCompatActivity {
 //        });
         mProfile = findViewById(R.id.user_profile);
         mProfile.setOnClickListener(v -> {
-            mFireBaseAuth.signOut();
-            sendToSignIn();
-//                Intent intent = new Intent(MainActivity.this, AnimationActivity.class);
-//                startActivity(intent);
+//            mFireBaseAuth.signOut();
+//            sendToSignIn();
+                Intent intent = new Intent(MainActivity.this, EditTextActivity.class);
+                startActivity(intent);
 //                DialogNewPost dialogNewPost= new DialogNewPost();
 //                dialogNewPost.show(getSupportFragmentManager(), dialogNewPost.getTag());
         });

@@ -42,7 +42,7 @@ public class FileUtils {
             } else if (isMediaDocument(uri)) {
                 final String documentId = DocumentsContract.getDocumentId(uri);
                 final String[] split = documentId.split(":");
-                final String type = split[1];
+                final String type = split[0];
 
                 Uri contentUri = null;
 

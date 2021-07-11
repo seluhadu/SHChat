@@ -13,6 +13,7 @@ public class MultiWatcher implements TextWatcher {
     public MultiWatcher(EditText[] editTexts, View view) {
         this.editTexts = editTexts;
         this.view = view;
+        view.setEnabled(false);
     }
 
     @Override
@@ -31,7 +32,9 @@ public class MultiWatcher implements TextWatcher {
             if (editText.getText().toString().trim().length() <= 0) {
                 view.setEnabled(false);
                 break;
-            } else view.setEnabled(true);
+            } else{
+                view.setEnabled(true);
+            }
         }
     }
 }

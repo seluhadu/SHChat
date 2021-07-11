@@ -3,23 +3,16 @@ package com.seluhadu.shchat.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.seluhadu.shchat.models.BaseMessage;
@@ -34,29 +27,14 @@ import java.util.List;
 import java.util.Objects;
 
 public class FireBaseMethods {
-    private static String url;
-    private static FireBaseMethods fireBaseMethods = null;
+    private static final String TAG = "FireBaseMethods";
     private Context mContext;
-    private FirebaseFirestore firebaseFirestore;
-    private StorageReference mStorageReference;
+
     private byte[] mUplodeBytes;
     private Uri mSelectedUri;
     private Bitmap mSelecetedBitmap;
 
     public FireBaseMethods() {
-    }
-
-    public FireBaseMethods(Context context) {
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        mStorageReference = FirebaseStorage.getInstance().getReference();
-        mContext = context;
-    }
-
-    public FireBaseMethods getInstance() {
-        if (fireBaseMethods == null) {
-            fireBaseMethods = new FireBaseMethods(mContext);
-        }
-        return fireBaseMethods;
     }
 
     public void uploadNewPhoto(String imageType, String caption, final int count, String url, Bitmap bitmap) {
@@ -135,11 +113,8 @@ public class FireBaseMethods {
     public static void deleteField(@NonNull String userId, @NonNull String documentId, @NonNull String field) {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         DocumentReference documentReference = firebaseFirestore.collection("Messages").document(userId).collection("Chats").document(documentId);
-        documentReference.update(field, FieldValue.delete()).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
+        documentReference.update(field, FieldValue.delete()).addOnCompleteListener(task -> {
 
-            }
         });
     }
 
@@ -149,49 +124,23 @@ public class FireBaseMethods {
                 .collection("Chats")
                 .document(String.valueOf(message.getMessageId()))
                 .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        deleteHandler.onMessageDelete(message, null);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                deleteHandler.onMessageDelete(null, e.getMessage());
-            }
-        });
+                .addOnSuccessListener(aVoid -> deleteHandler.onMessageDelete(message, null)).addOnFailureListener(e -> deleteHandler.onMessageDelete(null, e.getMessage()));
     }
 
     public static UserMessage sendUserMessage(String userId, String receiverId, String message, long newDay, FireBaseMethods.SendUserMessageHandler handler) {
         return sendUserMessage(userId, receiverId, message, System.currentTimeMillis(), 0, newDay, handler);
     }
 
-//    public static User getUser(String userId) {
-//        getUser(userId, new OnGetUserHandler() {
-//            @Override
-//            public User onGetUser(User user, String e) {
-//                return user;
-//            }
-//        });
-//        return null;
-//    }
-
     public static User getUser(final String userId) {
         final User user = new User();
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         final DocumentReference dr = firebaseFirestore.collection("Users").document(userId);
-        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                user.setUserName(documentSnapshot.get("userName").toString());
-                user.setUserId(documentSnapshot.get("userId").toString());
-                user.setUserProfile(documentSnapshot.get("userProfile").toString());
-                user.setUserDisplayName(documentSnapshot.get("userDisplayName").toString());
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-            }
+        dr.get().addOnSuccessListener(documentSnapshot -> {
+            user.setUserDisplayName((String) documentSnapshot.get("userDisplayName"));
+            user.setUserProfile((String) documentSnapshot.get("userProfile"));
+            user.setUserName((String) documentSnapshot.get("userName"));
+            user.setUserId((String) documentSnapshot.get("userId"));
+        }).addOnFailureListener(e -> {
         });
         return user;
     }
@@ -200,26 +149,18 @@ public class FireBaseMethods {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         final UserMessage userMessage = new UserMessage(UserMessage.build(userId, receiverId, message, createdAt, updatedAt, System.currentTimeMillis(), newDay));
         firebaseFirestore.collection("Messages")
-                .document(sortedUsersId(userId, receiverId)).collection("Chats").document(String.valueOf(userMessage.getMessageId())).set(userMessage).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                if (handler != null) {
-                    handler.onSent(userMessage, null);
-                }
+                .document(sortedUsersId(userId, receiverId)).collection("Chats").document(String.valueOf(userMessage.getMessageId())).set(userMessage).addOnSuccessListener(aVoid -> {
+            if (handler != null) {
+                handler.onSent(userMessage, null);
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                handler.onSent(null, e.getMessage());
-            }
-        });
+        }).addOnFailureListener(e -> handler.onSent(null, e.getMessage()));
         return userMessage;
     }
 
-    public static FileMessage sendFileMessage(final File file, String name, String type, Integer size, final String usersId, final FireBaseMethods.SendFileMessageHandler handler) {
+    public static FileMessage sendFileMessage(final File file, String name, String type, Integer size, final String senderId, String receiverId, final FireBaseMethods.SendFileMessageHandler handler) {
         if (file == null) {
             if (handler != null) {
-                handler.onSent(null, "fill is null");
+                handler.onMessageSent(null, "fill is null");
                 return null;
             }
         } else {
@@ -235,41 +176,52 @@ public class FireBaseMethods {
         }
 
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-        final StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-        final String msgFileId = firebaseFirestore.collection("Messages").document().getId();
-        storageReference.putFile(Uri.fromFile(file)).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                url = storageReference.getDownloadUrl().toString();
+        final StorageReference storageReference = FirebaseStorage.getInstance().getReference("Chats/Pictures/");
+        final FileMessage fileMessage = new FileMessage(FileMessage.build(FirebaseAuth.getInstance().getCurrentUser().getUid(), receiverId, "  ", name, size, type, "", null, System.currentTimeMillis(), 0L, System.currentTimeMillis(), System.currentTimeMillis()));
+        UploadTask uploadTask = storageReference.putFile(Uri.fromFile(file));
+        uploadTask.continueWithTask(task -> {
+            if (!task.isSuccessful()) {
+                throw task.getException();
             }
-        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                if (handler != null)
-                    handler.onProgress(taskSnapshot.getBytesTransferred(), taskSnapshot.getTotalByteCount());
+            return storageReference.getDownloadUrl();
+        }).addOnSuccessListener(uri -> {
+            if (handler!=null){
+                handler.onFileSent();
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                if (handler != null)
-                    handler.onSent(null, "Put File Error: " + e.getMessage());
-                url = "";
-            }
+            String url = String.valueOf(uri);
+            firebaseFirestore.collection("Messages").document(sortedUsersId(senderId, receiverId)).collection("Chats").document(String.valueOf(fileMessage.getMessageId())).update("url", url);
         });
-        final FileMessage fileMessage = new FileMessage(FileMessage.build(FirebaseAuth.getInstance().getCurrentUser().getUid(), "", url, name, size, type, "", null, System.currentTimeMillis(), 0l, System.currentTimeMillis()));
-        firebaseFirestore.collection("Messages").document(usersId).collection("Chat").document().set(msgFileId).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                if (handler != null)
-                    handler.onSent(fileMessage, null);
+        uploadTask.addOnProgressListener(taskSnapshot -> {
+            if (handler != null) {
+                handler.onProgress(taskSnapshot.getBytesTransferred(), taskSnapshot.getTotalByteCount());
+            }
+        }).addOnPausedListener(taskSnapshot -> {
 
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                if (handler != null)
-                    handler.onSent(null, "Send file info Error: " + e.getMessage());
-            }
+        }).addOnCanceledListener(() -> {
+
+        });
+//        storageReference.child(sortedUsersId(senderId, receiverId)).child(file.getName()).putFile(Uri.fromFile(file)).addOnSuccessListener(taskSnapshot -> {
+//            String msgId = String.valueOf(fileMessage.getMessageId());
+//            Log.d(TAG, "msgId" + msgId);
+//        }).addOnProgressListener(taskSnapshot -> {
+//            if (handler != null)
+//                handler.onProgress(taskSnapshot.getBytesTransferred(), taskSnapshot.getTotalByteCount());
+//        }).addOnFailureListener(e -> {
+//            if (handler != null)
+//                handler.onMessageSent(null, "Put File Error: " + e.getMessage());
+//        });
+//        storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+//            String url = uri.toString();
+//            String isNull = url.isEmpty() ? "null" : "url" + url;
+//            Log.d(TAG, "msgUrl " + isNull);
+//            firebaseFirestore.collection("Messages").document(sortedUsersId(senderId, receiverId)).collection("Chats").document(String.valueOf(fileMessage.getMessageId())).update("url", url);
+//        });
+        firebaseFirestore.collection("Messages").document(sortedUsersId(senderId, receiverId)).collection("Chats").document(String.valueOf(fileMessage.getMessageId())).set(fileMessage).addOnSuccessListener(aVoid -> {
+            if (handler != null)
+                handler.onMessageSent(fileMessage, null);
+        }).addOnFailureListener(e -> {
+            if (handler != null)
+                handler.onMessageSent(null, "Send file info Error: " + e.getMessage());
         });
         return fileMessage;
     }
@@ -278,20 +230,17 @@ public class FireBaseMethods {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         CollectionReference collectionReference = firebaseFirestore.collection("Messages").document(usersId).collection("Chats");
         Query query = collectionReference.limit(limit).orderBy("createdAt", Query.Direction.DESCENDING);
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                List<BaseMessage> messages = new ArrayList<>();
-                if (task.isSuccessful()) {
-                    for (DocumentChange documentChange : Objects.requireNonNull(task.getResult()).getDocumentChanges()) {
-                        BaseMessage baseMessage = BaseMessage.getMessages(documentChange);
-                        if (baseMessage != null) {
-                            messages.add(baseMessage);
-                        }
+        query.get().addOnCompleteListener(task -> {
+            List<BaseMessage> messages = new ArrayList<>();
+            if (task.isSuccessful()) {
+                for (DocumentChange documentChange : Objects.requireNonNull(task.getResult()).getDocumentChanges()) {
+                    BaseMessage baseMessage = BaseMessage.getMessages(documentChange);
+                    if (baseMessage != null) {
+                        messages.add(baseMessage);
                     }
-                    if (handler != null) {
-                        handler.onResult(messages, null);
-                    }
+                }
+                if (handler != null) {
+                    handler.onResult(messages, null);
                 }
             }
         });
@@ -312,9 +261,11 @@ public class FireBaseMethods {
     }
 
     public interface SendFileMessageHandler {
-        void onSent(FileMessage message, String e);
+        void onMessageSent(FileMessage message, String e);
 
         void onProgress(long totalBytesSent, long totalBytesToSend);
+
+        boolean  onFileSent();
     }
 
     public interface GetMessagesHandler {
@@ -323,9 +274,5 @@ public class FireBaseMethods {
 
     public interface OnUserMessageDeleteHandler {
         void onMessageDelete(UserMessage message, String e);
-    }
-
-    public interface OnGetUserHandler {
-        User onGetUser(User user, String e);
     }
 }

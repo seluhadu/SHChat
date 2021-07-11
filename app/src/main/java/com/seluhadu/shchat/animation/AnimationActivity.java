@@ -3,8 +3,8 @@ package com.seluhadu.shchat.animation;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -40,29 +40,23 @@ public class AnimationActivity extends AppCompatActivity {
         setContentView(R.layout.animation_activity);
         touchBg = findViewById(R.id.bg_touch);
         layout = findViewById(R.id.view_to_animate);
-        layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isKnown) {
-                    if (isExpanded) {
-                        collapse();
-                        touchBg.setBackgroundColor(Color.TRANSPARENT);
-                    } else {
-                        expand();
-                        touchBg.setBackgroundColor(getResources().getColor(R.color.touch_bg));
-                        touchBg.getBackground().setAlpha(160);
-                    }
-                    resizeAnimation.translate(cxWidth, cyHeight, isExpanded);
-                    isExpanded = !isExpanded;
+        layout.setOnClickListener(v -> {
+            if (isKnown) {
+                if (isExpanded) {
+                    collapse();
+                    touchBg.setBackgroundColor(Color.TRANSPARENT);
+                } else {
+                    expand();
+                    touchBg.setBackgroundColor(getResources().getColor(R.color.touch_bg));
+                    touchBg.getBackground().setAlpha(160);
                 }
+                resizeAnimation.translate(cxWidth, cyHeight, isExpanded);
+                isExpanded = !isExpanded;
             }
         });
 
-        touchBg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        touchBg.setOnClickListener(v -> {
 
-            }
         });
         Button start = findViewById(R.id.start);
         touchBg.setBackgroundColor(Color.TRANSPARENT);
@@ -126,17 +120,14 @@ public class AnimationActivity extends AppCompatActivity {
         resizeAnimation.setHeights(viewHeight, toHeight);
         resizeAnimation.setDuration(200);
         layout.startAnimation(resizeAnimation);
-        handler.postDelayed(runnable = new Runnable() {
-            @Override
-            public void run() {
-                        cxWidth = (widthDisplay / 2) - (toWidth / 2);
-                cyHeight = 0;
-                resizeAnimation.translate(cxWidth, cyHeight, isExpanded);
-                resizeAnimation.setWidths(toWidth, toWidth);
-                resizeAnimation.setHeights(toHeight, heightDisplay);
-                resizeAnimation.setDuration(200);
-                layout.startAnimation(resizeAnimation);
-            }
+        handler.postDelayed(runnable = () -> {
+                    cxWidth = (widthDisplay / 2) - (toWidth / 2);
+            cyHeight = 0;
+            resizeAnimation.translate(cxWidth, cyHeight, isExpanded);
+            resizeAnimation.setWidths(toWidth, toWidth);
+            resizeAnimation.setHeights(toHeight, heightDisplay);
+            resizeAnimation.setDuration(200);
+            layout.startAnimation(resizeAnimation);
         }, delay);
     }
 

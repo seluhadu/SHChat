@@ -1,8 +1,8 @@
 package com.seluhadu.shchat.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +12,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.seluhadu.shchat.R;
 import com.seluhadu.shchat.models.Photo;
 import com.seluhadu.shchat.models.User;
@@ -25,9 +23,8 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static android.support.constraint.Constraints.TAG;
-
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ItemHolder> {
+    private static final String TAG = "HomeAdapter";
     private Context mContext;
     private ArrayList<Photo> posts;
     private FirebaseFirestore mFireBaseFireStore;
@@ -52,35 +49,20 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ItemHolder> {
         //image posted
         Photo photo = posts.get(position);
         Glide.with(mContext).load(photo.getImageUrl()).into(holder.mPostImage);
-        holder.mThumpsUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.mThumpsUp.setOnClickListener(v -> {
 
-            }
         });
-        holder.mThumpsDown.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.mThumpsDown.setOnClickListener(v -> {
 
-            }
         });
-        holder.mMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.mMore.setOnClickListener(v -> {
 
-            }
         });
-        holder.mComment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.mComment.setOnClickListener(v -> {
 
-            }
         });
-        holder.mDownload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.mDownload.setOnClickListener(v -> {
 
-            }
         });
 
     }
@@ -126,16 +108,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ItemHolder> {
 //                .orderBy(mContext.getResources().getString(R.string.userId /*userId*/))
                 .whereEqualTo(mContext.getString(R.string.userId), posts.get(position).getUserId());
         Log.d(TAG, "getProfileAndName: ");
-        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    User user = documentSnapshot.toObject(User.class);
-                    holder.mUserName.setText(user.getUserDisplayName());
-                    Glide.with(mContext).load(user.getUserProfile()).into(holder.mProfile);
-                    Glide.with(mContext).load(user.getUserProfile()).into(holder.mPostImage);
-                    Log.d(TAG, "onSuccess: "+ user.getUserDisplayName());
-                }
+        query.get().addOnSuccessListener(queryDocumentSnapshots -> {
+            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                User user = documentSnapshot.toObject(User.class);
+                holder.mUserName.setText(user.getUserDisplayName());
+                Glide.with(mContext).load(user.getUserProfile()).into(holder.mProfile);
+                Glide.with(mContext).load(user.getUserProfile()).into(holder.mPostImage);
+                Log.d(TAG, "onSuccess: "+ user.getUserDisplayName());
             }
         });
     }
